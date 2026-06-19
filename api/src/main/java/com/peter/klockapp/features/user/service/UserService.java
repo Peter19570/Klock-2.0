@@ -1,0 +1,248 @@
+package com.peter.klockapp.features.user.service;
+
+import com.peter.klockapp.features.audit.dto.AuditRequest;
+import com.peter.klockapp.features.audit.enums.AuditAction;
+import com.peter.klockapp.features.auth.dto.request.AccountDeletionRequest;
+import com.peter.klockapp.features.auth.exceptions.AlreadyExistException;
+import com.peter.klockapp.features.auth.exceptions.NotFoundException;
+import com.peter.klockapp.features.auth.exceptions.ValidationException;
+import com.peter.klockapp.features.auth.repo.EmailVerificationTokenRepo;
+import com.peter.klockapp.features.auth.repo.PasswordResetTokenRepo;
+import com.peter.klockapp.features.auth.repo.RefreshTokenRepo;
+import com.peter.klockapp.features.auth.service.notification.EmailService;
+import com.peter.klockapp.features.auth.service.notification.OtpService;
+import com.peter.klockapp.features.branch.model.Branch;
+import com.peter.klockapp.features.branch.repo.BranchRepo;
+import com.peter.klockapp.features.storage.service.CloudinaryService;
+import com.peter.klockapp.features.user.dto.request.*;
+import com.peter.klockapp.features.user.dto.response.UserDetailedResponse;
+import com.peter.klockapp.features.user.dto.response.UserResponse;
+import com.peter.klockapp.features.user.enums.UserRole;
+import com.peter.klockapp.features.user.filters.UserFilter;
+import com.peter.klockapp.features.user.mapper.UserMapper;
+import com.peter.klockapp.features.user.model.User;
+import com.peter.klockapp.features.user.repo.UserRepo;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.peter.klockapp.features.user.specification.UserSpecification;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.time.Instant;
+import java.util.Map;
+import java.util.UUID;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepo userRepo;
+    private final UserMapper userMapper;
+    private final OtpService otpService;
+    private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenRepo refreshTokenRepo;
+    private final BranchRepo branchRepo;
+    private final UserSpecification userSpecification;
+    private final EmailVerificationTokenRepo emailVerificationTokenRepo;
+    private final PasswordResetTokenRepo passwordResetTokenRepo;
+    private final ApplicationEventPublisher eventPublisher;
+    private final CloudinaryService cloudinaryService;
+
+    public UserResponse create(AdminCreateUserRequest request, User currentUser){
+        if (userRepo.existsByEmail(request.email())) {
+            throw new AlreadyExistException("Email already registered");
+        }
+
+        if ((UserRole.ADMIN.equals(request.userRole())
+                || UserRole.SUPER_ADMIN.equals(request.userRole()))
+                && request.phone() == null) {
+            throw new IllegalStateException("Admins and Super Admins must have phone entered");
+        }
+
+        Branch branch = branchRepo.findByOrganizationIdAndId(
+                currentUser.getOrganization().getId(), request.branchId())
+                .orElseThrow(() -> new NotFoundException("Branch not found"));
+
+        User newUser = userMapper.toEntity(request);
+        newUser.setPassword(passwordEncoder.encode(request.firstName().toLowerCase() + "@123"));
+        newUser.setOrganization(currentUser.getOrganization());
+        newUser.setBranch(branch);
+
+        eventPublisher.publishEvent(new AuditRequest(currentUser, AuditAction.USER_CREATED,
+                Map.of("message", "New user created")));
+
+        return userMapper.toDto(userRepo.save(newUser));
+    }
+
+    @Transactional(readOnly = true)
+    public UserDetailedResponse findById(User currentUser, UUID userId){
+        User user = userRepo.findByIdAndOrganizationId(userId, currentUser.getOrganization().getId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        return userMapper.toDetailedDto(user);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserResponse> findAll(Pageable pageable, UserFilter userFilter, User currentUser){
+        UserRole role = currentUser.getUserRole();
+
+        switch (role){
+            case ADMIN -> {
+                userFilter.setBranchId(currentUser.getBranch().getId());
+                userFilter.setOrgId(currentUser.getOrganization().getId());
+            }
+
+            case SUPER_ADMIN -> {
+                userFilter.setOrgId(currentUser.getOrganization().getId());
+            }
+        }
+
+        Page<User> userPage = userRepo.findAll(userSpecification.withFilter(userFilter), pageable);
+        return userPage.map(userMapper::toDto);
+    }
+
+    public UserResponse update(UserUpdateRequest request, UUID userId, User currentUser){
+        User user = userRepo.findByIdAndOrganizationId(userId, currentUser.getOrganization().getId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        boolean isAdminOrSuperAdmin = UserRole.ADMIN.equals(request.userRole())
+                || UserRole.SUPER_ADMIN.equals(request.userRole());
+
+        if (isAdminOrSuperAdmin && (request.phone() == null)) {
+            throw new IllegalStateException("Admins and Super Admins must have phone not null");
+        }
+
+        if (UserRole.ADMIN.equals(request.userRole()) && request.branchId() == null) {
+            throw new IllegalStateException("Admins must be assigned a branch");
+        }
+
+        if (request.branchId() != null){
+            Branch branch = branchRepo.findByOrganizationIdAndId(
+                    currentUser.getOrganization().getId(), request.branchId())
+                    .orElseThrow(() -> new NotFoundException("Branch not found"));
+
+            user.setBranch(branch);
+        }
+
+        userMapper.updateEntityFromRequest(request, user);
+        return userMapper.toDto(user);
+    }
+
+    public void delete(User currentUser, UUID userId){
+        userRepo.deleteByIdAndOrganizationId(
+                userId, currentUser.getOrganization().getId());
+    }
+
+    public User syncUser(GoogleIdToken.Payload payload){
+        User existingUser =  userRepo.findByEmail(payload.getEmail()).orElseGet(() -> {
+            User user = userMapper.toEntityFromGoogle(payload);
+
+            eventPublisher.publishEvent(new AuditRequest(user, AuditAction.REGISTER,
+                    Map.of("message", "User created account with Google login")));
+
+            return userRepo.save(user);
+        });
+
+        if (existingUser.getFirstName() == null){
+            existingUser.setFirstName(payload.get("given_name").toString());
+            existingUser.setLastName(payload.get("family_name").toString());
+            existingUser.setPicture(payload.get("picture").toString());
+            existingUser.setEmailVerified(true);
+
+            String provider = existingUser.getProvider();
+
+            if (provider == null) {
+                existingUser.setProvider("GOOGLE");
+            } else if (!provider.contains("GOOGLE")) {
+                existingUser.setProvider(provider + ",GOOGLE");
+            }
+
+            userRepo.save(existingUser);
+        }
+
+        eventPublisher.publishEvent(new AuditRequest(existingUser, AuditAction.LOGIN,
+                Map.of("message", "Google login success")));
+
+        return existingUser;
+    }
+
+    @Transactional(readOnly = true)
+    public void createDeletionRequest(User currentUser) {
+        String code = otpService.generateOtp(currentUser.getEmail());
+        emailService.sendAccountDeletionCode(currentUser.getEmail(), code);
+    }
+
+    public void confirmDeletionRequest(User currentUser, AccountDeletionRequest request) {
+        if (currentUser.getPassword() != null) {
+            if (!passwordEncoder.matches(request.password(), currentUser.getPassword())) {
+                throw new BadCredentialsException("Invalid password provided for account deletion.");
+            }
+        }
+
+        if (!otpService.validateOtp(currentUser.getEmail(), request.otp()
+                .replaceAll("\\s+", ""))) {
+            throw new ValidationException("Invalid or expired deletion code.");
+        }
+
+        currentUser.setDeletedAt(Instant.now());
+        refreshTokenRepo.deleteById(currentUser.getId());
+        passwordResetTokenRepo.deleteById(currentUser.getId());
+        emailVerificationTokenRepo.deleteById(currentUser.getId());
+        userRepo.save(currentUser);
+
+        eventPublisher.publishEvent(new AuditRequest(currentUser, AuditAction.ACCOUNT_SOFT_DELETED,
+                Map.of("message", "User has been soft deleted")));
+    }
+
+    public void updateDeviceId(UserDeviceIdRequest request, User currentUser){
+        User user = userRepo.findByIdAndOrganizationId(currentUser.getId(), currentUser.getOrganization().getId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        user.setDeviceId(request.deviceId());
+        user.setHasSetDevice(true);
+    }
+
+    public void resetDeviceIdToDefault(UUID userId, User currentUser){
+        User user = userRepo.findByIdAndOrganizationId(userId, currentUser.getOrganization().getId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        user.setDeviceId("NOT SET");
+        user.setHasSetDevice(false);
+    }
+
+    public void updateUserAvatar(UserUpdateAvatarRequest request){
+        User user = userRepo.findByIdAndOrganizationId(request.userId(), request.orgId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        user.setPicture(request.secureId());
+        user.setPictureId(request.publicId());
+    }
+
+    public void deleteUserAvatar(User currentUser) throws IOException {
+        User user = userRepo.findByIdAndOrganizationId(currentUser.getId(), currentUser.getOrganization().getId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        if (user.getPictureId() != null){
+            cloudinaryService.deletePhotoFromCloud(user.getPictureId());
+        }
+
+        user.setPicture(null);
+        user.setPictureId(null);
+    }
+
+    public void changePasswordOnLogin(UserChangePassword request, User currentUser){
+        User user = userRepo.findByIdAndOrganizationId(currentUser.getId(),
+                        currentUser.getOrganization().getId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        user.setMustChangePassword(false);
+    }
+}
