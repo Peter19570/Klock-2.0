@@ -13,6 +13,7 @@ import java.util.UUID;
 @Builder
 public class AuditFilter {
 
+    private String email;
     private String fullName;
     private AuditAction auditAction;
     private UUID userId;

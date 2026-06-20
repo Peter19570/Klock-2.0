@@ -1,14 +1,18 @@
 package com.peter.klockapp.features.auth.service.notification;
 
 import com.peter.klockapp.features.auth.exceptions.AuthenticationException;
+import com.peter.klockapp.features.auth.exceptions.MessageException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.rmi.UnknownHostException;
 
 @Service
 @RequiredArgsConstructor
@@ -118,7 +122,6 @@ public class EmailService {
                 newEmail, confirmationUrl
         );
 
-        // 3. Dispatch via your mail provider
         sendHtmlEmail(newEmail, subject, message);
     }
 
@@ -130,8 +133,9 @@ public class EmailService {
             helper.setSubject(subject);
             helper.setText(body, true);
             mailSender.send(message);
-        } catch (MessagingException e) {
-            throw new AuthenticationException("Failed to send email");
+
+        } catch (MessagingException | MailSendException e) {
+            throw new MessageException("Failed to send email");
         }
     }
 }

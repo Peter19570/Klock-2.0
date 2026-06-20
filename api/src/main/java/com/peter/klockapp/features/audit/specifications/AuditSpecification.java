@@ -43,6 +43,11 @@ public class AuditSpecification {
                     criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), auditLogFilter.getMaxCreatedAt()));
         }
 
+        if (auditLogFilter.getEmail() != null){
+            spec = spec.and((root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("email"), auditLogFilter.getEmail()));
+        }
+
         return spec;
     }
 }

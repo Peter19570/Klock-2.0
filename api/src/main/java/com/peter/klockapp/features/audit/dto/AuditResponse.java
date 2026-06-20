@@ -8,6 +8,7 @@ import java.util.UUID;
 public record AuditResponse(
         UUID userId,
         String fullName,
+        String email,
         AuditAction action,
         Map<String, Object> metadata
 ) {

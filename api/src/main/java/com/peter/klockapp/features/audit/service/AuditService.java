@@ -32,6 +32,7 @@ public class AuditService {
                 .userId(request.user().getId())
                 .organizationId(request.user().getOrganization().getId())
                 .fullName(request.user().getFirstName() + " " + request.user().getLastName())
+                .email(request.user().getEmail())
                 .action(request.auditAction())
                 .metadata(request.metaData())
                 .build();
