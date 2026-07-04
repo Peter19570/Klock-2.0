@@ -4,6 +4,7 @@ import com.peter.klockapp.features.avatar.service.AvatarService;
 import com.peter.klockapp.features.shared.dto.ApiResponse;
 import com.peter.klockapp.features.shared.dto.CustomUserPrincipal;
 import com.peter.klockapp.features.storage.dto.CloudinaryResponse;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,7 @@ public class AvatarController {
     }
 
     @PostMapping("/webhook")
+    @Hidden
     public ResponseEntity<Void> cloudinaryWebhook(
             @RequestBody Map<String, Object> payload){
         avatarService.handleCloudinaryWebhook(payload);

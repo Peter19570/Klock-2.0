@@ -63,6 +63,7 @@ public class SessionController {
     }
 
     @PatchMapping("/{id}/terminate")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<Void> forceEndSession(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @PathVariable UUID id){
