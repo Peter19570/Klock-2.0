@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@Tag(name = "Authentication")
+@Tag(name = "Authentication", description = "Maximum auth at hand | with event driven emails sent")
 public class AuthController {
 
     private final AuthService authService;
