@@ -28,12 +28,7 @@ public class OrganizationService {
     private final OrganizationMapper organizationMapper;
     private final AuthService authService;
     private final UserService userService;
-
-    public Organization fetchOrganization(UUID orgId){
-        return organizationRepo.findByIdAndDeletedAtIsNull(orgId)
-                .orElseThrow(() -> new NotFoundException("Organization not found"));
-    }
-
+    
     public OrganizationResponse createOrg(OrganizationRequest request){
         Organization organization = organizationRepo.save(organizationMapper.toEntity(request));
         AuthResponse authResponse = authService.register(request.registerRequest(), organization);
