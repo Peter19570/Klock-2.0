@@ -11,3 +11,19 @@ export function getLandingRoute(role: UserRole): string {
       return "/dashboard";
   }
 }
+
+export const ROUTE_ROLES: Record<string, UserRole[]> = {
+  "/dashboard": ["ADMIN", "SUPER_ADMIN"],
+  "/attendance": ["USER", "ADMIN", "SUPER_ADMIN"],
+  "/sessions": ["ADMIN", "SUPER_ADMIN"],
+  "/branches": ["ADMIN", "SUPER_ADMIN"],
+  "/users": ["ADMIN", "SUPER_ADMIN"],
+  "/organization": ["SUPER_ADMIN"],
+  "/audits": ["SUPER_ADMIN"],
+  "/settings": ["USER", "ADMIN", "SUPER_ADMIN"],
+};
+
+export function getAllowedRoles(pathname: string): UserRole[] | null {
+  const match = Object.keys(ROUTE_ROLES).find((prefix) => pathname.startsWith(prefix));
+  return match ? ROUTE_ROLES[match] : null;
+}
