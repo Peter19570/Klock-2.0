@@ -23,6 +23,8 @@ public interface ClockEventRepo extends JpaRepository<ClockEvent, UUID> {
     Optional<ClockEvent> findBySessionUserIdAndUserOrganizationIdAndClockOutTimeIsNull(
             UUID userId, UUID organizationId);
 
+    Optional<ClockEvent> findBySessionIdAndClockOutTimeIsNull(UUID sessionId);
+
     long countByClockOutTimeIsNullAndSessionStatusAndBranchIdAndOrganizationId(
             SessionStatus sessionStatus, UUID branchId, UUID orgId);
 

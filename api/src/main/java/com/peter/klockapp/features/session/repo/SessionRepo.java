@@ -20,6 +20,9 @@ public interface SessionRepo extends JpaRepository<Session, UUID>, JpaSpecificat
     Optional<Session> findByWorkDateAndUserIdAndUserOrganizationId(
             LocalDate workDate, UUID userId, UUID organizationId);
 
+    Optional<Session> findByIdAndOrganizationIdAndStatus(
+            UUID sessionId, UUID orgId, SessionStatus sessionStatus);
+
     void deleteByUserIdAndUserOrganizationIdAndId(
             UUID userId, UUID organizationId, UUID sessionId);
 

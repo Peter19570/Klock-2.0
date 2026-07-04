@@ -17,8 +17,10 @@ import com.peter.klockapp.features.session.model.Session;
 import com.peter.klockapp.features.session.repo.SessionRepo;
 import com.peter.klockapp.features.session.specification.SessionSpecification;
 import com.peter.klockapp.features.shared.dto.CustomUserPrincipal;
+import com.peter.klockapp.features.shared.dto.PageResponse;
 import com.peter.klockapp.features.user.enums.UserRole;
 import com.peter.klockapp.features.user.model.User;
+import com.peter.klockapp.features.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -45,6 +47,7 @@ public class SessionService {
     private final ClockEventRepo clockEventRepo;
     private final SessionSpecification sessionSpecification;
     private final ApplicationEventPublisher eventPublisher;
+    private final UserService userService;
 
     public Session getOrCreateSession(Branch targetBranch, User currentUser){
         return sessionRepo.findByWorkDateAndUserIdAndUserOrganizationId(
@@ -60,9 +63,10 @@ public class SessionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<SessionResponse> getAllSessions(
-            User currentUser, Pageable pageable, SessionFilter filter) {
+    public PageResponse<SessionResponse> getAllSessions(
+            CustomUserPrincipal principal, Pageable pageable, SessionFilter filter) {
 
+        User currentUser = userService.fetchCurrentUser(principal);
         UserRole role = currentUser.getUserRole();
 
         switch (role) {
@@ -80,18 +84,19 @@ public class SessionService {
             }
         }
 
-        return sessionRepo.findAll(sessionSpecification.withFilter(filter), pageable)
-                .map(sessionMapper::toDto);
+        Page<Session> sessions = sessionRepo.findAll(sessionSpecification.withFilter(filter), pageable);
+
+        return PageResponse.from(sessions.map(sessionMapper::toDto));
     }
 
-    public void forceEndSession(User currentUser, UUID sessionId){
-        Session activeSession = sessionRepo.findByWorkDateAndUserIdAndUserOrganizationId(
-                LocalDate.now(), currentUser.getId(), currentUser.getOrganization().getId())
+    public void forceEndSession(CustomUserPrincipal principal, UUID sessionId){
+        User currentUser = userService.fetchCurrentUser(principal);
+        Session activeSession = sessionRepo.findByIdAndOrganizationIdAndStatus(
+                sessionId, principal.orgId(), SessionStatus.ACTIVE)
                 .orElseThrow(() -> new NotFoundException("Session not found"));
 
         ClockEvent activeClockEvent = clockEventRepo
-                .findBySessionUserIdAndUserOrganizationIdAndClockOutTimeIsNull(
-                        sessionId, currentUser.getOrganization().getId())
+                .findBySessionIdAndClockOutTimeIsNull(activeSession.getId())
                 .orElseThrow(() -> new NotFoundException("Clock event not found"));
 
         activeClockEvent.setClockOutTime(Instant.now());
@@ -103,13 +108,14 @@ public class SessionService {
                 Map.of("message", "Admin successfully terminated session")));
     }
 
-    public void deleteSession(User currentUser, UUID sessionId){
+    public void deleteSession(CustomUserPrincipal principal, UUID sessionId){
         sessionRepo.deleteByUserIdAndUserOrganizationIdAndId(
-                currentUser.getId(), currentUser.getOrganization().getId(), sessionId);
+                principal.id(), principal.orgId(), sessionId);
     }
 
     @Transactional(readOnly = true)
-    public void processExport(Writer writer, User currentUser, LocalDate start, LocalDate end) {
+    public void processExport(Writer writer, CustomUserPrincipal principal, LocalDate start, LocalDate end) {
+        User currentUser = userService.fetchCurrentUser(principal);
         boolean isSuperAdmin = currentUser.getUserRole().equals(UserRole.SUPER_ADMIN);
 
         UUID filterBranchId = isSuperAdmin ? null : currentUser.getBranch().getId();

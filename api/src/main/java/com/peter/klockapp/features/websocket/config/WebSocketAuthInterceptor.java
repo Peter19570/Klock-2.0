@@ -34,7 +34,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                     String userId = jwtService.extractUserId(token);
                     CustomUserPrincipal principal = customUserDetailsService.loadUserById(userId);
 
-                    if (jwtService.isTokenValid(token, principal.user().getId().toString())) {
+                    if (jwtService.isTokenValid(token, principal.id().toString())) {
                         UsernamePasswordAuthenticationToken auth =
                                 new UsernamePasswordAuthenticationToken(
                                         principal, null, principal.getAuthorities());

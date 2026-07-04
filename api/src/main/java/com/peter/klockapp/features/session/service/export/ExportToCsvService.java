@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 public class ExportToCsvService {
 
     @Async
-    public void writeToCsv(Writer writer, Stream<Session> sessions) {
+    public static void writeToCsv(Writer writer, Stream<Session> sessions) {
         CSVFormat format = CSVFormat.DEFAULT.builder()
                 .setHeader(
                         "Date",

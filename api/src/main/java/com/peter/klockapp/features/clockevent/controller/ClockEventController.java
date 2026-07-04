@@ -29,10 +29,10 @@ public class ClockEventController {
     public ResponseEntity<ApiResponse<ClockEventResponse>> clockIn(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestBody @Valid ClockInRequest request) throws BadRequestException {
-        ClockEventResponse response = clockEventService.clockIn(request, principal.user());
+        ClockEventResponse response = clockEventService.clockIn(request, principal);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>("Clock in successfully", response));
+                .body(ApiResponse.success("Clock in successfully", response));
     }
 
     @PatchMapping("/active")
@@ -40,15 +40,15 @@ public class ClockEventController {
     public ResponseEntity<ApiResponse<ClockEventResponse>> clockOut(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestBody @Valid ClockOutRequest request){
-        ClockEventResponse response = clockEventService.clockOut(request, principal.user());
-        return ResponseEntity.ok(new ApiResponse<>("Clock out successfully", response));
+        ClockEventResponse response = clockEventService.clockOut(request, principal);
+        return ResponseEntity.ok(ApiResponse.success("Clock out successfully", response));
     }
 
     @GetMapping("/active")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ApiResponse<Boolean>> isActive(
             @AuthenticationPrincipal CustomUserPrincipal principal){
-        Boolean response = clockEventService.isActive(principal.user());
-        return ResponseEntity.ok(new ApiResponse<>("Available clock event ?", response));
+        Boolean response = clockEventService.isActive(principal);
+        return ResponseEntity.ok(ApiResponse.success("Available clock event ?", response));
     }
 }

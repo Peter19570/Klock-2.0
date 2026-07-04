@@ -16,13 +16,13 @@ import java.util.UUID;
 @Repository
 public interface BranchRepo extends JpaRepository<Branch, UUID>, JpaSpecificationExecutor<Branch> {
 
-    Optional<Branch> findByOrganizationIdAndId(
+    Optional<Branch> findByOrganizationIdAndIdAndDeletedAtIsNull(
             UUID organizationId, UUID branchId);
 
-    List<Branch> findAllByOrganizationId
+    List<Branch> findAllByOrganizationIdAndDeletedAtIsNull
             (UUID organizationId);
 
-    long countByOrganizationIdAndBranchStatus(
+    long countByOrganizationIdAndBranchStatusAndDeletedAtIsNull(
             UUID orgId, BranchStatus branchStatus);
 
     @Query("SELECT COUNT(e) FROM ClockEvent e WHERE e.branch.id = :branchId" +

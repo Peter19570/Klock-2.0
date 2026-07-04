@@ -13,9 +13,11 @@ import com.peter.klockapp.features.session.enums.SessionArrivalStatus;
 import com.peter.klockapp.features.session.enums.SessionStatus;
 import com.peter.klockapp.features.session.mapper.SessionMapper;
 import com.peter.klockapp.features.session.repo.SessionRepo;
+import com.peter.klockapp.features.shared.dto.CustomUserPrincipal;
 import com.peter.klockapp.features.user.enums.UserRole;
 import com.peter.klockapp.features.user.model.User;
 import com.peter.klockapp.features.user.repo.UserRepo;
+import com.peter.klockapp.features.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,8 +43,11 @@ public class DashboardService {
     private final BranchRepo branchRepo;
     private final SessionMapper sessionMapper;
     private final DashboardMapper dashboardMapper;
+    private final UserService userService;
 
-    public DashboardSuperAdminResponse getSuperAdminDashboard(User currentUser) {
+    public DashboardSuperAdminResponse getSuperAdminDashboard(CustomUserPrincipal principal) {
+        User currentUser = userService.fetchCurrentUser(principal);
+
         UUID orgId = currentUser.getOrganization().getId();
         Instant startOfToday = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant();
 
@@ -58,7 +63,7 @@ public class DashboardService {
         long totalLateArrivals = sessionRepo.countByArrivalStatusAndOrganizationIdAndWorkDate(
                 SessionArrivalStatus.LATE, orgId, LocalDate.now());
 
-        long lockedBranchCount = branchRepo.countByOrganizationIdAndBranchStatus(
+        long lockedBranchCount = branchRepo.countByOrganizationIdAndBranchStatusAndDeletedAtIsNull(
                 orgId, BranchStatus.LOCKED);
 
         List<DashboardSuperAdminResponse.SessionTrend> trend = getLast7DaysTrend(orgId);
@@ -88,7 +93,9 @@ public class DashboardService {
         );
     }
 
-    public DashboardAdminResponse getAdminDashBoard(User currentUser, UUID branchUUID){
+    public DashboardAdminResponse getAdminDashBoard(CustomUserPrincipal principal, UUID branchUUID){
+        User currentUser = userService.fetchCurrentUser(principal);
+
         UUID orgId = currentUser.getOrganization().getId();
         UUID branchId = null;
 

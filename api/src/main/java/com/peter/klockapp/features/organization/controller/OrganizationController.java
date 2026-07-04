@@ -30,15 +30,15 @@ public class OrganizationController {
         OrganizationResponse response = organizationService.createOrg(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>("Organization Created Successfully", response));
+                .body(ApiResponse.success("Organization Created Successfully", response));
     }
 
     @GetMapping
     @PreAuthorize("isAuthenticated() and hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<OrganizationDetailedResponse>> getDetailedOrg(
             @AuthenticationPrincipal CustomUserPrincipal principal){
-        OrganizationDetailedResponse response = organizationService.getDetailedOrg(principal.user());
-        return ResponseEntity.ok(new ApiResponse<>("Organization Information", response));
+        OrganizationDetailedResponse response = organizationService.getDetailedOrg(principal);
+        return ResponseEntity.ok(ApiResponse.success("Organization Information", response));
     }
 
     @PatchMapping
@@ -46,15 +46,15 @@ public class OrganizationController {
     public ResponseEntity<ApiResponse<OrganizationDetailedResponse>> updateOrg(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestBody OrganizationUpdateRequest request){
-        OrganizationDetailedResponse response = organizationService.updateOrg(request, principal.user());
-        return ResponseEntity.ok(new ApiResponse<>("Organization Successfully Updated", response));
+        OrganizationDetailedResponse response = organizationService.updateOrg(request, principal);
+        return ResponseEntity.ok(ApiResponse.success("Organization Successfully Updated", response));
     }
 
     @DeleteMapping
     @PreAuthorize("isAuthenticated() and hasRole('SUPER_ADMIN')")
     public ResponseEntity<Void> deleteOrg(
             @AuthenticationPrincipal CustomUserPrincipal principal){
-        organizationService.deleteOrg(principal.user());
+        organizationService.deleteOrg(principal);
         return ResponseEntity.noContent().build();
     }
 }

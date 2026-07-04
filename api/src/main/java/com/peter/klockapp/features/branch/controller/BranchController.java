@@ -9,6 +9,7 @@ import com.peter.klockapp.features.branch.filters.BranchFilter;
 import com.peter.klockapp.features.branch.service.BranchService;
 import com.peter.klockapp.features.shared.dto.ApiResponse;
 import com.peter.klockapp.features.shared.dto.CustomUserPrincipal;
+import com.peter.klockapp.features.shared.dto.PageResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,15 +38,15 @@ public class BranchController {
     public ResponseEntity<ApiResponse<BranchResponse>> createBranch(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestBody @Valid BranchRequest request){
-        BranchResponse response = branchService.createBranch(principal.user(), request);
+        BranchResponse response = branchService.createBranch(principal, request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>("Branch created successfully", response));
+                .body(ApiResponse.success("Branch created successfully", response));
     }
 
     @GetMapping
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public ResponseEntity<ApiResponse<Page<BranchResponse>>> getBranches(
+    public ResponseEntity<ApiResponse<PageResponse<BranchResponse>>> getBranches(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(required = false) String displayName,
@@ -54,12 +55,12 @@ public class BranchController {
         BranchFilter branchFilter = BranchFilter.builder()
                 .displayName(displayName)
                 .branchStatus(branchStatus)
-                .userOrgId(principal.user().getOrganization().getId())
+                .userOrgId(principal.orgId())
                 .build();
 
         Pageable pageable = PageRequest.of(page, 50, Sort.by("createdAt").descending());
-        Page<BranchResponse> responses = branchService.getBranches(pageable, branchFilter);
-        return ResponseEntity.ok(new ApiResponse<>("All Branches", responses));
+        PageResponse<BranchResponse> responses = branchService.getBranches(pageable, branchFilter);
+        return ResponseEntity.ok(ApiResponse.success("All Branches", responses));
     }
 
     @GetMapping("/{id}")
@@ -67,15 +68,15 @@ public class BranchController {
     public ResponseEntity<ApiResponse<BranchDetailedResponse>> getDetailedBranch(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @PathVariable UUID id){
-        BranchDetailedResponse response = branchService.getDetailedBranch(principal.user(), id);
-        return ResponseEntity.ok(new ApiResponse<>("Branch Details", response));
+        BranchDetailedResponse response = branchService.getDetailedBranch(principal, id);
+        return ResponseEntity.ok(ApiResponse.success("Branch Details", response));
     }
 
     @GetMapping("/active")
     public ResponseEntity<ApiResponse<BranchUserResponse>> getDetailedBranchForUser(
             @AuthenticationPrincipal CustomUserPrincipal principal){
-        BranchUserResponse response = branchService.getDetailedBranchForUser(principal.user());
-        return ResponseEntity.ok(new ApiResponse<>("Active Branch Details", response));
+        BranchUserResponse response = branchService.getDetailedBranchForUser(principal);
+        return ResponseEntity.ok(ApiResponse.success("Active Branch Details", response));
     }
 
     @PatchMapping("/{id}")
@@ -84,8 +85,8 @@ public class BranchController {
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestBody @Valid BranchRequest request,
             @PathVariable UUID id){
-        BranchResponse response = branchService.updateBranch(principal.user(), id, request);
-        return ResponseEntity.ok(new ApiResponse<>("Branch updated successfully", response));
+        BranchResponse response = branchService.updateBranch(principal, id, request);
+        return ResponseEntity.ok(ApiResponse.success("Branch updated successfully", response));
     }
 
     @DeleteMapping("/{id}")
@@ -93,7 +94,7 @@ public class BranchController {
     public ResponseEntity<Void> deleteBranch(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @PathVariable UUID id){
-        branchService.deleteBranch(principal.user(), id);
+        branchService.deleteBranch(principal, id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -38,14 +38,48 @@ public class JwtService {
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
+        claims.put("email", principal.email());
+        claims.put("orgId", principal.orgId());
         claims.put("roles", roles);
-        claims.put("email", principal.getUsername());
+        claims.put("type", "access");
 
-        return createToken(claims, principal.user().getId().toString(), accessTokenExpiration.toMillis());
+        return createToken(claims, principal.id().toString(), accessTokenExpiration.toMillis());
     }
 
     public String generateRefreshToken(CustomUserPrincipal principal) {
-        return createToken(new HashMap<>(), principal.user().getId().toString(), refreshTokenExpiration.toMillis());
+        Map<String, Object> claims = new HashMap<>();
+
+        claims.put("type", "refresh");
+        return createToken(claims, principal.id().toString(), refreshTokenExpiration.toMillis());
+    }
+
+    public boolean isTokenValid(String token, String expectedUserId) {
+        final String userIdFromToken = extractUserId(token);
+        return (userIdFromToken.equals(expectedUserId) && !isTokenExpired(token));
+    }
+
+    public String extractUserId(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public String extractUserEmail(String token){
+        return extractClaim(token, claims -> claims.get("email", String.class));
+    }
+
+    public String extractUserOrgId(String token){
+        return extractClaim(token, claims -> claims.get("orgId", String.class));
+    }
+
+    public List<String> extractUserRoles(String token){
+        return extractClaim(token, claims -> claims.get("roles", List.class));
+    }
+
+    public String extractTokenType(String token){
+        return extractClaim(token, claims -> claims.get("type", String.class));
+    }
+
+    public long getAccessExpirationInSeconds() {
+        return accessTokenExpiration.toSeconds();
     }
 
     private String createToken(Map<String, Object> claims, String subject, long expirationMillis) {
@@ -59,22 +93,9 @@ public class JwtService {
                 .compact();
     }
 
-    public boolean isTokenValid(String token, String expectedUserId) {
-        final String userIdFromToken = extractUserId(token);
-        return (userIdFromToken.equals(expectedUserId) && !isTokenExpired(token));
-    }
-
-    public String extractUserId(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    private  <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
-    }
-
-    public long getAccessExpirationInSeconds() {
-        return accessTokenExpiration.toSeconds();
     }
 
     private Claims extractAllClaims(String token) {

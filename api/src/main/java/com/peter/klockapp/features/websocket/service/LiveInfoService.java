@@ -4,7 +4,9 @@ import com.peter.klockapp.features.auth.exceptions.NotFoundException;
 import com.peter.klockapp.features.clockevent.repo.ClockEventRepo;
 import com.peter.klockapp.features.session.model.Session;
 import com.peter.klockapp.features.session.repo.SessionRepo;
+import com.peter.klockapp.features.shared.dto.CustomUserPrincipal;
 import com.peter.klockapp.features.user.model.User;
+import com.peter.klockapp.features.user.service.UserService;
 import com.peter.klockapp.features.websocket.dto.request.LiveUserInfoRequest;
 import com.peter.klockapp.features.websocket.dto.response.LiveUserInfoResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +23,11 @@ public class LiveInfoService {
 
     private final ClockEventRepo clockEventRepo;
     private final SessionRepo sessionRepo;
+    private final UserService userService;
 
-    public LiveUserInfoResponse broadcastUserInfo(User currentUser, LiveUserInfoRequest request){
+    public LiveUserInfoResponse broadcastUserInfo(CustomUserPrincipal principal, LiveUserInfoRequest request){
+        User currentUser = userService.fetchCurrentUser(principal);
+
         String userId = currentUser.getId().toString();
         String email = currentUser.getEmail();
         String fullName = currentUser.getFirstName() + " " + currentUser.getLastName();

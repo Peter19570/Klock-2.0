@@ -16,8 +16,10 @@ import com.peter.klockapp.features.session.enums.SessionStatus;
 import com.peter.klockapp.features.session.model.Session;
 import com.peter.klockapp.features.session.repo.SessionRepo;
 import com.peter.klockapp.features.session.service.SessionService;
+import com.peter.klockapp.features.shared.dto.CustomUserPrincipal;
 import com.peter.klockapp.features.shared.util.LocationUtility;
 import com.peter.klockapp.features.user.model.User;
+import com.peter.klockapp.features.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.context.ApplicationEventPublisher;
@@ -39,14 +41,17 @@ public class ClockEventService {
     private final ClockEventMapper clockEventMapper;
     private final BranchService branchService;
     private final SessionService sessionService;
+    private final UserService userService;
     private final SessionRepo sessionRepo;
     private final ApplicationEventPublisher eventPublisher;
 
-    public ClockEventResponse clockIn(ClockInRequest request, User currentUser)
+    public ClockEventResponse clockIn(ClockInRequest request, CustomUserPrincipal principal)
             throws BadRequestException {
 
+        User currentUser = userService.fetchCurrentUser(principal);
+
         Branch targetBranch = branchService.getTargetBranch(
-                request.latitude(), request.longitude(), currentUser);
+                request.latitude(), request.longitude(), principal);
 
         double distance = LocationUtility.calculateDistance(
                 request.latitude(), request.longitude(),
@@ -118,14 +123,16 @@ public class ClockEventService {
         return clockEventMapper.toDto(clockEventRepo.save(event));
     }
 
-    public ClockEventResponse clockOut(ClockOutRequest request, User currentUser){
+    public ClockEventResponse clockOut(ClockOutRequest request, CustomUserPrincipal principal){
+        User currentUser = userService.fetchCurrentUser(principal);
+
         ClockEvent activeClockEvent = clockEventRepo
                 .findBySessionUserIdAndUserOrganizationIdAndClockOutTimeIsNull(
-                        currentUser.getId(), currentUser.getOrganization().getId())
+                        principal.id(), principal.orgId())
                 .orElseThrow(() -> new NotFoundException("No active clock-in session found."));
 
         Session activeSession = sessionRepo.findByWorkDateAndUserIdAndUserOrganizationId(
-                LocalDate.now(), currentUser.getId(), currentUser.getOrganization().getId())
+                LocalDate.now(), principal.id(), principal.orgId())
                 .orElseThrow(() -> new NotFoundException("Session not found"));
 
         double distance = LocationUtility.calculateDistance(
@@ -168,8 +175,8 @@ public class ClockEventService {
     }
 
     @Transactional(readOnly = true)
-    public Boolean isActive(User currentUser) {
+    public Boolean isActive(CustomUserPrincipal principal) {
         return clockEventRepo.existsBySessionUserIdAndUserOrganizationIdAndClockOutTimeIsNull(
-                currentUser.getId(), currentUser.getOrganization().getId());
+                principal.id(), principal.orgId());
     }
 }

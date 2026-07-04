@@ -30,9 +30,8 @@ public class DashboardController {
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<DashboardSuperAdminResponse>> getSuperAdminDashboard(
             @AuthenticationPrincipal CustomUserPrincipal principal){
-        DashboardSuperAdminResponse response = dashboardService.getSuperAdminDashboard(principal.user());
-        return ResponseEntity.ok(
-                new ApiResponse<>("Super Admin Dashboard Overview", response));
+        DashboardSuperAdminResponse response = dashboardService.getSuperAdminDashboard(principal);
+        return ResponseEntity.ok(ApiResponse.success("Super Admin Dashboard Overview", response));
     }
 
 //    Omo don't forget oo, client has to hit the backend with branchId to see dashboard of that specific branch
@@ -41,8 +40,7 @@ public class DashboardController {
     public ResponseEntity<ApiResponse<DashboardAdminResponse>> getAdminDashBoard(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestParam(required = false) UUID branchId){
-        DashboardAdminResponse response = dashboardService.getAdminDashBoard(principal.user(), branchId);
-        return ResponseEntity.ok(
-                new ApiResponse<>("Admin (Branch) Dashboard Overview", response));
+        DashboardAdminResponse response = dashboardService.getAdminDashBoard(principal, branchId);
+        return ResponseEntity.ok(ApiResponse.success("Admin (Branch) Dashboard Overview", response));
     }
 }

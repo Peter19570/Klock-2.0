@@ -31,4 +31,6 @@ public class BaseEntity {
     @Column(nullable = false)
     private Instant updatedAt;
 
+    private Instant deletedAt;
+
 }

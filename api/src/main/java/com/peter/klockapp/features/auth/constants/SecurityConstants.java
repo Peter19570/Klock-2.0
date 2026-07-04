@@ -8,7 +8,7 @@ public final class SecurityConstants {
 
     public static final String[] SWAGGER_URLS = {"/swagger-ui/**", "/v3/api-docs/**"};
 
-    public static final String[] WEBSOCKET_URLS = {"/api/v1/avatar/webhook"};
+    public static final String[] WEBHOOK_URLS = {"/api/v1/avatar/webhook"};
 
-    public static final String[] WEBHOOK_URLS = {"/ws-klock/**"};
+    public static final String[] WEBSOCKET_URLS = {"/api/v1/ws-klock/**"};
 }

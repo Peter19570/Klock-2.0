@@ -40,7 +40,6 @@ public class User extends BaseEntity {
     private String picture;
     private String pictureId;
     private Instant lockedUntil;
-    private Instant deletedAt;
     private String provider;
     private String deviceId = "NOT SET";
 

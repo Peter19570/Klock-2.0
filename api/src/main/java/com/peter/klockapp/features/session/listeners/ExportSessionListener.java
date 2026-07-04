@@ -10,10 +10,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ExportSessionListener {
 
-    private final ExportToCsvService export;
-
     @EventListener
     public void onExportSessionCsv(ExportToCsvRequest request){
-        export.writeToCsv(request.writer(), request.sessions());
+        ExportToCsvService.writeToCsv(request.writer(), request.sessions());
     }
 }

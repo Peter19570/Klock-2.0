@@ -6,6 +6,7 @@ import com.peter.klockapp.features.audit.filters.AuditFilter;
 import com.peter.klockapp.features.audit.service.AuditService;
 import com.peter.klockapp.features.shared.dto.ApiResponse;
 import com.peter.klockapp.features.shared.dto.CustomUserPrincipal;
+import com.peter.klockapp.features.shared.dto.PageResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,7 +34,7 @@ public class AuditController {
 
     @GetMapping
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public ResponseEntity<ApiResponse<Page<AuditResponse>>> getAllAudits(
+    public ResponseEntity<ApiResponse<PageResponse<AuditResponse>>> getAllAudits(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(required = false) String fullName,
@@ -51,7 +52,7 @@ public class AuditController {
                 .build();
 
         Pageable pageable = PageRequest.of(page, 50, Sort.by("createdAt").descending());
-        Page<AuditResponse> responses = auditService.getAllAudits(pageable, filter, principal.user());
-        return ResponseEntity.ok(new ApiResponse<>("All Audit Logs", responses));
+        PageResponse<AuditResponse> responses = auditService.getAllAudits(pageable, filter, principal);
+        return ResponseEntity.ok(ApiResponse.success("All Audit Logs", responses));
     }
 }

@@ -10,10 +10,14 @@ import com.peter.klockapp.features.organization.dto.response.OrganizationRespons
 import com.peter.klockapp.features.organization.mapper.OrganizationMapper;
 import com.peter.klockapp.features.organization.model.Organization;
 import com.peter.klockapp.features.organization.repo.OrganizationRepo;
+import com.peter.klockapp.features.shared.dto.CustomUserPrincipal;
 import com.peter.klockapp.features.user.model.User;
+import com.peter.klockapp.features.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +27,12 @@ public class OrganizationService {
     private final OrganizationRepo organizationRepo;
     private final OrganizationMapper organizationMapper;
     private final AuthService authService;
+    private final UserService userService;
+
+    public Organization fetchOrganization(UUID orgId){
+        return organizationRepo.findByIdAndDeletedAtIsNull(orgId)
+                .orElseThrow(() -> new NotFoundException("Organization not found"));
+    }
 
     public OrganizationResponse createOrg(OrganizationRequest request){
         Organization organization = organizationRepo.save(organizationMapper.toEntity(request));
@@ -31,20 +41,20 @@ public class OrganizationService {
     }
 
     @Transactional(readOnly = true)
-    public OrganizationDetailedResponse getDetailedOrg(User currentUser){
-        Organization organization = organizationRepo.findById(currentUser.getOrganization().getId())
-                .orElseThrow(() -> new NotFoundException("Organization not found"));
+    public OrganizationDetailedResponse getDetailedOrg(CustomUserPrincipal principal){
+        User currentUser = userService.fetchCurrentUser(principal);
+        Organization organization = currentUser.getOrganization();
         return organizationMapper.toDetailedDto(organization);
     }
 
-    public OrganizationDetailedResponse updateOrg(OrganizationUpdateRequest request, User currentUser){
-        Organization organization = organizationRepo.findById(currentUser.getOrganization().getId())
-                .orElseThrow(() -> new NotFoundException("Organization not found"));
+    public OrganizationDetailedResponse updateOrg(OrganizationUpdateRequest request, CustomUserPrincipal principal){
+        User currentUser = userService.fetchCurrentUser(principal);
+        Organization organization = currentUser.getOrganization();
         organizationMapper.updateEntityFromRequest(request, organization);
         return organizationMapper.toDetailedDto(organization);
     }
 
-    public void deleteOrg(User currentUser){
-        organizationRepo.deleteById(currentUser.getOrganization().getId());
+    public void deleteOrg(CustomUserPrincipal principal){
+        organizationRepo.deleteById(principal.orgId());
     }
 }

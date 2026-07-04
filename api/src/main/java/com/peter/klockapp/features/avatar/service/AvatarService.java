@@ -1,5 +1,6 @@
 package com.peter.klockapp.features.avatar.service;
 
+import com.peter.klockapp.features.shared.dto.CustomUserPrincipal;
 import com.peter.klockapp.features.storage.dto.CloudinaryResponse;
 import com.peter.klockapp.features.storage.service.CloudinaryService;
 import com.peter.klockapp.features.user.dto.request.UserUpdateAvatarRequest;
@@ -20,7 +21,8 @@ public class AvatarService {
     private final CloudinaryService cloudinaryService;
     private final UserService userService;
 
-    public CloudinaryResponse generateAvatarSignature(User currentUser){
+    public CloudinaryResponse generateAvatarSignature(CustomUserPrincipal principal){
+        User currentUser = userService.fetchCurrentUser(principal);
         return cloudinaryService.generateUploadLinkInfo(currentUser);
     }
 

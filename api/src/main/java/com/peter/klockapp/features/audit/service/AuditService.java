@@ -7,7 +7,10 @@ import com.peter.klockapp.features.audit.mapper.AuditMapper;
 import com.peter.klockapp.features.audit.model.AuditLog;
 import com.peter.klockapp.features.audit.repo.AuditRepo;
 import com.peter.klockapp.features.audit.specifications.AuditSpecification;
+import com.peter.klockapp.features.shared.dto.CustomUserPrincipal;
+import com.peter.klockapp.features.shared.dto.PageResponse;
 import com.peter.klockapp.features.user.model.User;
+import com.peter.klockapp.features.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +27,7 @@ public class AuditService {
     private final AuditRepo auditRepo;
     private final AuditMapper auditMapper;
     private final AuditSpecification auditSpecification;
+    private final UserService userService;
 
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -40,10 +44,12 @@ public class AuditService {
         auditRepo.save(audit);
     }
 
-    public Page<AuditResponse> getAllAudits(
-            Pageable pageable, AuditFilter filter, User currentUser){
+    public PageResponse<AuditResponse> getAllAudits(
+            Pageable pageable, AuditFilter filter, CustomUserPrincipal principal){
+        User currentUser = userService.fetchCurrentUser(principal);
+
         filter.setOrgId(currentUser.getOrganization().getId());
         Page<AuditLog> responses = auditRepo.findAll(auditSpecification.withFilter(filter), pageable);
-        return responses.map(auditMapper::toDto);
+        return PageResponse.from(responses.map(auditMapper::toDto));
     }
 }

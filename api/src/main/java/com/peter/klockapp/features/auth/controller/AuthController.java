@@ -32,8 +32,7 @@ public class AuthController {
             @Valid @RequestBody AuthRequest request
     ) {
         AuthResponse response = authService.login(request);
-        return ResponseEntity.ok(new ApiResponse<>(
-                "Login success", response));
+        return ResponseEntity.ok(ApiResponse.success("Login success", response));
     }
 
     @PostMapping("/logout")
@@ -42,9 +41,11 @@ public class AuthController {
             @Valid @RequestBody RefreshTokenRequest request,
             @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
-        authService.logout(request.refreshToken(), principal.user());
-        return ResponseEntity.ok(new ApiResponse<>(
-                "Logout success", "You have successfully logged out of your account."));
+        authService.logout(request, principal);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Logout success",
+                        "You have successfully logged out of your account."));
     }
 
     @PostMapping("/refresh")
@@ -52,8 +53,7 @@ public class AuthController {
             @Valid @RequestBody RefreshTokenRequest request
     ) {
         TokenResponse response = authService.refresh(request);
-        return ResponseEntity.ok(new ApiResponse<>(
-                "Token refresh success", response));
+        return ResponseEntity.ok(ApiResponse.success("Token refresh success", response));
     }
 
 //    =========================================================================================
@@ -65,7 +65,8 @@ public class AuthController {
             @RequestParam @NotNull(message = "Token is required") String token) {
         authService.verifyEmail(token);
         return ResponseEntity.ok(new ApiResponse<>(
-                "Verification Complete", "Identity verification successful."));
+                "Verification Complete",
+                "Identity verification successful."));
     }
 
     @PostMapping("/change-email")
@@ -74,19 +75,19 @@ public class AuthController {
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestBody @Valid EmailChangeRequest request) {
 
-        authService.requestEmailChange(principal.user(), request);
-        return ResponseEntity.ok(new ApiResponse<>(
-                "Verification Required", "Please check your new inbox and click" +
-                " the secure activation link we just sent you."));
+        authService.requestEmailChange(principal, request);
+        return ResponseEntity.ok(ApiResponse.success(
+                "Verification Required",
+                "Please check your new inbox and click the secure activation link we just sent you."));
     }
 
     @GetMapping("/confirm-email")
     public ResponseEntity<ApiResponse<String>> confirmChange(
             @RequestParam("token") @NotNull(message = "Token is required") String token) {
         authService.confirmEmailChange(token);
-        return ResponseEntity.ok(new ApiResponse<>(
-                "Email Address Updated", "Your primary email " +
-                "address has been successfully changed."));
+        return ResponseEntity.ok(ApiResponse.success(
+                "Email Address Updated",
+                "Your primary email address has been successfully changed."));
     }
 
 //    =========================================================================================
@@ -97,7 +98,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<String>> forgotPassword(
             @Valid @RequestBody ForgotPasswordRequest request) {
         authService.requestPasswordReset(request);
-        return ResponseEntity.ok(new ApiResponse<>(
+        return ResponseEntity.ok(ApiResponse.success(
                 "Password Reset Initiated",
                 "An email containing further instructions has been dispatched to " +
                         "the provided address, provided a corresponding account exists."));
@@ -107,8 +108,9 @@ public class AuthController {
     public ResponseEntity<ApiResponse<String>> resetPassword(
             @Valid @RequestBody ResetPasswordRequest request) {
         authService.resetPassword(request.token(), request.newPassword());
-        return ResponseEntity.ok(new ApiResponse<>(
-                "Password Updated", "Your password has been successfully reset." +
-                " You may now log in with your new credentials."));
+        return ResponseEntity.ok(ApiResponse.success(
+                "Password Updated",
+                "Your password has been successfully reset." +
+                        " You may now log in with your new credentials."));
     }
 }

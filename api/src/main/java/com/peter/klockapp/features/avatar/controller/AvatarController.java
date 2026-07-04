@@ -26,8 +26,8 @@ public class AvatarController {
     @PostMapping("/initialize")
     public ResponseEntity<ApiResponse<CloudinaryResponse>> initializeAvatarUpload(
             @AuthenticationPrincipal CustomUserPrincipal principal){
-        CloudinaryResponse response = avatarService.generateAvatarSignature(principal.user());
-        return ResponseEntity.ok(new ApiResponse<>("Upload initiated successfully", response));
+        CloudinaryResponse response = avatarService.generateAvatarSignature(principal);
+        return ResponseEntity.ok(ApiResponse.success("Upload initiated successfully", response));
     }
 
     @PostMapping("/webhook")

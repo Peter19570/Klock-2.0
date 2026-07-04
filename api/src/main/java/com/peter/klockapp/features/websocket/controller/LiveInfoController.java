@@ -22,7 +22,7 @@ public class LiveInfoController {
     public void broadcastUserInfo(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @Valid LiveUserInfoRequest request){
-        LiveUserInfoResponse response = liveInfoService.broadcastUserInfo(principal.user(), request);
+        LiveUserInfoResponse response = liveInfoService.broadcastUserInfo(principal, request);
         simpMessagingTemplate.convertAndSend("/topic/user-info", response);
     }
 }

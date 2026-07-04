@@ -7,6 +7,7 @@ import com.peter.klockapp.features.session.filters.SessionFilter;
 import com.peter.klockapp.features.session.service.SessionService;
 import com.peter.klockapp.features.shared.dto.ApiResponse;
 import com.peter.klockapp.features.shared.dto.CustomUserPrincipal;
+import com.peter.klockapp.features.shared.dto.PageResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class SessionController {
     private final SessionService sessionService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<SessionResponse>>> getSessions(
+    public ResponseEntity<ApiResponse<PageResponse<SessionResponse>>> getSessions(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(required = false) UUID userId,
@@ -56,16 +57,16 @@ public class SessionController {
                 .build();
 
         Pageable pageable = PageRequest.of(page, 50, Sort.by("createdAt").descending());
-        Page<SessionResponse> responses = sessionService.getAllSessions(
-                principal.user(), pageable, sessionFilter);
-        return ResponseEntity.ok(new ApiResponse<>("All Sessions", responses));
+        PageResponse<SessionResponse> responses = sessionService.getAllSessions(
+                principal, pageable, sessionFilter);
+        return ResponseEntity.ok(ApiResponse.success("All Sessions", responses));
     }
 
     @PatchMapping("/{id}/terminate")
     public ResponseEntity<Void> forceEndSession(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @PathVariable UUID id){
-        sessionService.forceEndSession(principal.user(), id);
+        sessionService.forceEndSession(principal, id);
         return ResponseEntity.noContent().build();
     }
 
@@ -74,7 +75,7 @@ public class SessionController {
     public ResponseEntity<Void> deleteSession(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @PathVariable UUID id){
-        sessionService.deleteSession(principal.user(), id);
+        sessionService.deleteSession(principal, id);
         return ResponseEntity.noContent().build();
     }
 
@@ -94,7 +95,7 @@ public class SessionController {
         String filename = String.format("work_report_%s_to_%s.csv", startDate, endDate);
         response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 
-        sessionService.processExport(response.getWriter(), principal.user(), startDate, endDate);
+        sessionService.processExport(response.getWriter(), principal, startDate, endDate);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 }

@@ -3,6 +3,7 @@ package com.peter.klockapp.features.user.controller;
 import com.peter.klockapp.features.auth.dto.request.AccountDeletionRequest;
 import com.peter.klockapp.features.shared.dto.ApiResponse;
 import com.peter.klockapp.features.shared.dto.CustomUserPrincipal;
+import com.peter.klockapp.features.shared.dto.PageResponse;
 import com.peter.klockapp.features.user.dto.request.AdminCreateUserRequest;
 import com.peter.klockapp.features.user.dto.request.UserChangePassword;
 import com.peter.klockapp.features.user.dto.request.UserDeviceIdRequest;
@@ -42,15 +43,15 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserResponse>> createUser(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestBody AdminCreateUserRequest request){
-        UserResponse response = userService.create(request, principal.user());
+        UserResponse response = userService.create(request, principal);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>("New user created successfully", response));
+                .body(ApiResponse.success("New user created successfully", response));
     }
 
     @GetMapping
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
-    public ResponseEntity<ApiResponse<Page<UserResponse>>> getAllUsers(
+    public ResponseEntity<ApiResponse<PageResponse<UserResponse>>> getAllUsers(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(required = false) String email,
@@ -72,8 +73,8 @@ public class UserController {
                 .build();
 
         Pageable pageable = PageRequest.of(page, 50, Sort.by("createdAt").descending());
-        Page<UserResponse> userResponses = userService.findAll(pageable, filter, principal.user());
-        return ResponseEntity.ok(new ApiResponse<>("User list", userResponses));
+        PageResponse<UserResponse> userResponses = userService.findAll(pageable, filter, principal);
+        return ResponseEntity.ok(ApiResponse.success("User list", userResponses));
     }
 
     @GetMapping("/{id}")
@@ -81,8 +82,8 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserDetailedResponse>> getById(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @PathVariable UUID id){
-        UserDetailedResponse response = userService.findById(principal.user(), id);
-        return ResponseEntity.ok(new ApiResponse<>("Selected user information", response));
+        UserDetailedResponse response = userService.findById(principal);
+        return ResponseEntity.ok(ApiResponse.success("Selected user information", response));
     }
 
     @PatchMapping("/{id}")
@@ -91,8 +92,8 @@ public class UserController {
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @Valid @RequestBody UserUpdateRequest request,
             @PathVariable UUID id){
-        UserResponse response = userService.update(request, id, principal.user());
-        return ResponseEntity.ok(new ApiResponse<>("User updated successfully", response));
+        UserResponse response = userService.update(request, id, principal);
+        return ResponseEntity.ok(ApiResponse.success("User updated successfully", response));
     }
 
     @DeleteMapping("/{id}")
@@ -100,7 +101,7 @@ public class UserController {
     public ResponseEntity<Void> delete(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @PathVariable UUID id){
-        userService.delete(principal.user(), id);
+        userService.delete(principal, id);
         return ResponseEntity.noContent().build();
     }
 
@@ -109,21 +110,21 @@ public class UserController {
     public ResponseEntity<Void> resetDeviceId(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @PathVariable UUID id){
-        userService.resetDeviceIdToDefault(id, principal.user());
+        userService.resetDeviceIdToDefault(id, principal);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserDetailedResponse>> getCurrentUser(
             @AuthenticationPrincipal CustomUserPrincipal principal){
-        UserDetailedResponse response = userService.findById(principal.user(), principal.user().getId());
-        return ResponseEntity.ok(new ApiResponse<>("Current user information", response));
+        UserDetailedResponse response = userService.findById(principal);
+        return ResponseEntity.ok(ApiResponse.success("Current user information", response));
     }
 
     @PostMapping("/me/deletion-request")
     public ResponseEntity<Void> requestDeletion(
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        userService.createDeletionRequest(principal.user());
+        userService.createDeletionRequest(principal);
         return ResponseEntity.ok().build();
     }
 
@@ -131,7 +132,7 @@ public class UserController {
     public ResponseEntity<Void> confirmDeletion(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestBody AccountDeletionRequest request) {
-        userService.confirmDeletionRequest(principal.user(), request);
+        userService.confirmDeletionRequest(principal, request);
         return ResponseEntity.noContent().build();
     }
 
@@ -139,14 +140,14 @@ public class UserController {
     public ResponseEntity<Void> updateDeviceId(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @Valid @RequestBody UserDeviceIdRequest request){
-        userService.updateDeviceId(request, principal.user());
+        userService.updateDeviceId(request, principal);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/me/avatar")
     public ResponseEntity<Void> deleteAvatar(
             @AuthenticationPrincipal CustomUserPrincipal principal) throws IOException {
-        userService.deleteUserAvatar(principal.user());
+        userService.deleteUserAvatar(principal);
         return ResponseEntity.noContent().build();
     }
 
@@ -154,7 +155,7 @@ public class UserController {
     public ResponseEntity<Void> changePassword(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestBody @Valid UserChangePassword request){
-        userService.changePasswordOnLogin(request, principal.user());
+        userService.changePasswordOnLogin(request, principal);
         return ResponseEntity.noContent().build();
     }
 }

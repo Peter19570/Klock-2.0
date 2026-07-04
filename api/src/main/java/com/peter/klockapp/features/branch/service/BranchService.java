@@ -17,9 +17,13 @@ import com.peter.klockapp.features.clockevent.model.ClockEvent;
 import com.peter.klockapp.features.clockevent.repo.ClockEventRepo;
 import com.peter.klockapp.features.organization.model.Organization;
 import com.peter.klockapp.features.organization.repo.OrganizationRepo;
+import com.peter.klockapp.features.organization.service.OrganizationService;
+import com.peter.klockapp.features.shared.dto.CustomUserPrincipal;
+import com.peter.klockapp.features.shared.dto.PageResponse;
 import com.peter.klockapp.features.shared.util.LocationUtility;
 import com.peter.klockapp.features.user.enums.UserRole;
 import com.peter.klockapp.features.user.model.User;
+import com.peter.klockapp.features.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.context.ApplicationEventPublisher;
@@ -41,14 +45,20 @@ public class BranchService {
     private final BranchRepo branchRepo;
     private final BranchMapper branchMapper;
     private final ClockEventRepo clockEventRepo;
-    private final OrganizationRepo organizationRepo;
     private final BranchSpecification branchSpecification;
     private final ApplicationEventPublisher eventPublisher;
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private final UserService userService;
 
-    public BranchResponse createBranch(User currentUser, BranchRequest request){
-        Organization organization = organizationRepo.findById(currentUser.getOrganization().getId())
-                .orElseThrow(() -> new NotFoundException("Organization not found"));
+    public Branch fetchBranch(CustomUserPrincipal principal, UUID branchId){
+        return branchRepo.findByOrganizationIdAndIdAndDeletedAtIsNull(
+                        principal.orgId(), branchId)
+                .orElseThrow(() -> new NotFoundException("Branch not found"));
+    }
+
+    public BranchResponse createBranch(CustomUserPrincipal principal, BranchRequest request){
+        User currentUser = userService.fetchCurrentUser(principal);
+        Organization organization = currentUser.getOrganization();
 
         Branch branch = branchMapper.toEntity(request);
         branch.setOrganization(organization);
@@ -60,8 +70,10 @@ public class BranchService {
     }
 
     @Transactional(readOnly = true)
-    public BranchDetailedResponse getDetailedBranch(User currentUser, UUID branchId){
+    public BranchDetailedResponse getDetailedBranch(CustomUserPrincipal principal, UUID branchId){
         UUID branchUUID;
+
+        User currentUser = userService.fetchCurrentUser(principal);
 
         if (currentUser.getUserRole().equals(UserRole.SUPER_ADMIN)) {
             branchUUID = branchId;
@@ -70,7 +82,7 @@ public class BranchService {
         }
 
         Branch branch = branchRepo
-                .findByOrganizationIdAndId(currentUser.getOrganization().getId(), branchUUID)
+                .findByOrganizationIdAndIdAndDeletedAtIsNull(currentUser.getOrganization().getId(), branchUUID)
                 .orElseThrow(() -> new NotFoundException("Branch not found"));
 
         long activeNow = branchRepo.countActiveUsersByBranchId(
@@ -95,12 +107,14 @@ public class BranchService {
         );
     }
 
-    public BranchUserResponse getDetailedBranchForUser(User user){
+    public BranchUserResponse getDetailedBranchForUser(CustomUserPrincipal principal){
+        User user = userService.fetchCurrentUser(principal);
+
         ClockEvent clockEvent = clockEventRepo.findBySessionUserIdAndUserOrganizationIdAndClockOutTimeIsNull(
                 user.getId(), user.getOrganization().getId())
                 .orElseThrow(() -> new NotFoundException("Branch details are only available after clock-in."));
 
-        Branch branch = branchRepo.findByOrganizationIdAndId(
+        Branch branch = branchRepo.findByOrganizationIdAndIdAndDeletedAtIsNull(
                 user.getOrganization().getId(), clockEvent.getBranch().getId())
                 .orElseThrow(() -> new NotFoundException("Branch not found"));
 
@@ -108,16 +122,18 @@ public class BranchService {
     }
 
     @Transactional(readOnly = true)
-    public Page<BranchResponse> getBranches(Pageable pageable, BranchFilter branchFilter){
+    public PageResponse<BranchResponse> getBranches(Pageable pageable, BranchFilter branchFilter){
         Page<Branch> branchPage = branchRepo
                 .findAll(branchSpecification.withFilter(branchFilter), pageable);
-        return branchPage.map(branchMapper::toDto);
+        return PageResponse.from(branchPage.map(branchMapper::toDto));
     }
 
-    public BranchResponse updateBranch(User currentUser, UUID branchId, BranchRequest request){
+    public BranchResponse updateBranch(CustomUserPrincipal principal, UUID branchId, BranchRequest request){
+
+        User currentUser = userService.fetchCurrentUser(principal);
 
         Branch branch = branchRepo
-                .findByOrganizationIdAndId(currentUser.getOrganization().getId(), branchId)
+                .findByOrganizationIdAndIdAndDeletedAtIsNull(currentUser.getOrganization().getId(), branchId)
                 .orElseThrow(() -> new NotFoundException("Branch not found"));
 
         boolean isSuper = currentUser.getUserRole().equals(UserRole.SUPER_ADMIN);
@@ -138,8 +154,10 @@ public class BranchService {
         return branchMapper.toDto(branch);
     }
 
-    public void deleteBranch(User currentUser, UUID branchId){
-        Branch branch = branchRepo.findByOrganizationIdAndId(currentUser.getOrganization().getId(), branchId)
+    public void deleteBranch(CustomUserPrincipal principal, UUID branchId){
+        User currentUser = userService.fetchCurrentUser(principal);
+
+        Branch branch = branchRepo.findByOrganizationIdAndIdAndDeletedAtIsNull(currentUser.getOrganization().getId(), branchId)
                 .orElseThrow(() -> new NotFoundException("Branch not found"));
 
         eventPublisher.publishEvent(new AuditRequest(currentUser, AuditAction.BRANCH_DELETED,
@@ -148,8 +166,11 @@ public class BranchService {
         branchRepo.deleteById(branch.getId());
     }
 
-    public Branch getTargetBranch(double latitude, double longitude, User currentUser) throws BadRequestException {
-        return branchRepo.findAllByOrganizationId(currentUser.getOrganization().getId()).stream()
+    public Branch getTargetBranch(double latitude, double longitude, CustomUserPrincipal principal)
+            throws BadRequestException {
+        User currentUser = userService.fetchCurrentUser(principal);
+
+        return branchRepo.findAllByOrganizationIdAndDeletedAtIsNull(currentUser.getOrganization().getId()).stream()
                 .filter(branch -> LocationUtility.isWithinRadius(
                         latitude, longitude,
                         branch.getLatitude(), branch.getLongitude(),

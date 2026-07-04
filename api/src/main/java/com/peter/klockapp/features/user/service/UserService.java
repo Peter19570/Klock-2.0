@@ -13,6 +13,11 @@ import com.peter.klockapp.features.auth.service.notification.EmailService;
 import com.peter.klockapp.features.auth.service.notification.OtpService;
 import com.peter.klockapp.features.branch.model.Branch;
 import com.peter.klockapp.features.branch.repo.BranchRepo;
+import com.peter.klockapp.features.branch.service.BranchService;
+import com.peter.klockapp.features.organization.model.Organization;
+import com.peter.klockapp.features.organization.service.OrganizationService;
+import com.peter.klockapp.features.shared.dto.CustomUserPrincipal;
+import com.peter.klockapp.features.shared.dto.PageResponse;
 import com.peter.klockapp.features.storage.service.CloudinaryService;
 import com.peter.klockapp.features.user.dto.request.*;
 import com.peter.klockapp.features.user.dto.response.UserDetailedResponse;
@@ -49,14 +54,20 @@ public class UserService {
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepo refreshTokenRepo;
-    private final BranchRepo branchRepo;
     private final UserSpecification userSpecification;
     private final EmailVerificationTokenRepo emailVerificationTokenRepo;
     private final PasswordResetTokenRepo passwordResetTokenRepo;
     private final ApplicationEventPublisher eventPublisher;
     private final CloudinaryService cloudinaryService;
+    private final BranchRepo branchRepo;
 
-    public UserResponse create(AdminCreateUserRequest request, User currentUser){
+    @Transactional(readOnly = true)
+    public User fetchCurrentUser(CustomUserPrincipal principal){
+        return userRepo.findByIdAndOrganizationIdAndDeletedAtIsNull(principal.id(), principal.orgId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+    }
+
+    public UserResponse create(AdminCreateUserRequest request, CustomUserPrincipal principal){
         if (userRepo.existsByEmail(request.email())) {
             throw new AlreadyExistException("Email already registered");
         }
@@ -67,13 +78,14 @@ public class UserService {
             throw new IllegalStateException("Admins and Super Admins must have phone entered");
         }
 
-        Branch branch = branchRepo.findByOrganizationIdAndId(
-                currentUser.getOrganization().getId(), request.branchId())
+        User currentUser = fetchCurrentUser(principal);
+        Organization organization = currentUser.getOrganization();
+        Branch branch = branchRepo.findByOrganizationIdAndIdAndDeletedAtIsNull(organization.getId(), request.branchId())
                 .orElseThrow(() -> new NotFoundException("Branch not found"));
 
         User newUser = userMapper.toEntity(request);
         newUser.setPassword(passwordEncoder.encode(request.firstName().toLowerCase() + "@123"));
-        newUser.setOrganization(currentUser.getOrganization());
+        newUser.setOrganization(organization);
         newUser.setBranch(branch);
 
         eventPublisher.publishEvent(new AuditRequest(currentUser, AuditAction.USER_CREATED,
@@ -83,15 +95,14 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserDetailedResponse findById(User currentUser, UUID userId){
-        User user = userRepo.findByIdAndOrganizationId(userId, currentUser.getOrganization().getId())
-                .orElseThrow(() -> new NotFoundException("User not found"));
-
-        return userMapper.toDetailedDto(user);
+    public UserDetailedResponse findById(CustomUserPrincipal principal){
+        return userMapper.toDetailedDto(fetchCurrentUser(principal));
     }
 
     @Transactional(readOnly = true)
-    public Page<UserResponse> findAll(Pageable pageable, UserFilter userFilter, User currentUser){
+    public PageResponse<UserResponse> findAll(Pageable pageable, UserFilter userFilter, CustomUserPrincipal principal){
+        User currentUser = fetchCurrentUser(principal);
+
         UserRole role = currentUser.getUserRole();
 
         switch (role){
@@ -106,11 +117,11 @@ public class UserService {
         }
 
         Page<User> userPage = userRepo.findAll(userSpecification.withFilter(userFilter), pageable);
-        return userPage.map(userMapper::toDto);
+        return PageResponse.from(userPage.map(userMapper::toDto));
     }
 
-    public UserResponse update(UserUpdateRequest request, UUID userId, User currentUser){
-        User user = userRepo.findByIdAndOrganizationId(userId, currentUser.getOrganization().getId())
+    public UserResponse update(UserUpdateRequest request, UUID userId, CustomUserPrincipal principal){
+        User user = userRepo.findByIdAndOrganizationIdAndDeletedAtIsNull(userId, principal.orgId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         boolean isAdminOrSuperAdmin = UserRole.ADMIN.equals(request.userRole())
@@ -125,8 +136,8 @@ public class UserService {
         }
 
         if (request.branchId() != null){
-            Branch branch = branchRepo.findByOrganizationIdAndId(
-                    currentUser.getOrganization().getId(), request.branchId())
+            Branch branch = branchRepo.findByOrganizationIdAndIdAndDeletedAtIsNull(
+                    user.getOrganization().getId(), request.branchId())
                     .orElseThrow(() -> new NotFoundException("Branch not found"));
 
             user.setBranch(branch);
@@ -136,9 +147,9 @@ public class UserService {
         return userMapper.toDto(user);
     }
 
-    public void delete(User currentUser, UUID userId){
+    public void delete(CustomUserPrincipal principal, UUID userId){
         userRepo.deleteByIdAndOrganizationId(
-                userId, currentUser.getOrganization().getId());
+                userId, principal.orgId());
     }
 
     public User syncUser(GoogleIdToken.Payload payload){
@@ -175,12 +186,16 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public void createDeletionRequest(User currentUser) {
+    public void createDeletionRequest(CustomUserPrincipal principal) {
+        User currentUser = fetchCurrentUser(principal);
+
         String code = otpService.generateOtp(currentUser.getEmail());
-        emailService.sendAccountDeletionCode(currentUser.getEmail(), code);
+        emailService.sendAccountDeletionCode(currentUser, code);
     }
 
-    public void confirmDeletionRequest(User currentUser, AccountDeletionRequest request) {
+    public void confirmDeletionRequest(CustomUserPrincipal principal, AccountDeletionRequest request) {
+        User currentUser = fetchCurrentUser(principal);
+
         if (currentUser.getPassword() != null) {
             if (!passwordEncoder.matches(request.password(), currentUser.getPassword())) {
                 throw new BadCredentialsException("Invalid password provided for account deletion.");
@@ -202,32 +217,31 @@ public class UserService {
                 Map.of("message", "User has been soft deleted")));
     }
 
-    public void updateDeviceId(UserDeviceIdRequest request, User currentUser){
-        User user = userRepo.findByIdAndOrganizationId(currentUser.getId(), currentUser.getOrganization().getId())
-                .orElseThrow(() -> new NotFoundException("User not found"));
+    public void updateDeviceId(UserDeviceIdRequest request, CustomUserPrincipal principal){
+        User user = fetchCurrentUser(principal);
 
         user.setDeviceId(request.deviceId());
         user.setHasSetDevice(true);
     }
 
-    public void resetDeviceIdToDefault(UUID userId, User currentUser){
-        User user = userRepo.findByIdAndOrganizationId(userId, currentUser.getOrganization().getId())
+    public void resetDeviceIdToDefault(UUID userId, CustomUserPrincipal principal){
+        User user = userRepo.findByIdAndOrganizationIdAndDeletedAtIsNull(userId, principal.orgId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
+
         user.setDeviceId("NOT SET");
         user.setHasSetDevice(false);
     }
 
     public void updateUserAvatar(UserUpdateAvatarRequest request){
-        User user = userRepo.findByIdAndOrganizationId(request.userId(), request.orgId())
+        User user = userRepo.findByIdAndOrganizationIdAndDeletedAtIsNull(request.userId(), request.orgId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         user.setPicture(request.secureId());
         user.setPictureId(request.publicId());
     }
 
-    public void deleteUserAvatar(User currentUser) throws IOException {
-        User user = userRepo.findByIdAndOrganizationId(currentUser.getId(), currentUser.getOrganization().getId())
-                .orElseThrow(() -> new NotFoundException("User not found"));
+    public void deleteUserAvatar(CustomUserPrincipal principal) throws IOException {
+        User user = fetchCurrentUser(principal);
 
         if (user.getPictureId() != null){
             cloudinaryService.deletePhotoFromCloud(user.getPictureId());
@@ -237,10 +251,8 @@ public class UserService {
         user.setPictureId(null);
     }
 
-    public void changePasswordOnLogin(UserChangePassword request, User currentUser){
-        User user = userRepo.findByIdAndOrganizationId(currentUser.getId(),
-                        currentUser.getOrganization().getId())
-                .orElseThrow(() -> new NotFoundException("User not found"));
+    public void changePasswordOnLogin(UserChangePassword request, CustomUserPrincipal principal){
+        User user = fetchCurrentUser(principal);
 
         user.setPassword(passwordEncoder.encode(request.newPassword()));
         user.setMustChangePassword(false);

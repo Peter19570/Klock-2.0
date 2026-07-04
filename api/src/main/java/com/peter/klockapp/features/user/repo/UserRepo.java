@@ -4,8 +4,6 @@ import com.peter.klockapp.features.user.enums.UserRole;
 import com.peter.klockapp.features.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -22,7 +20,7 @@ public interface UserRepo extends JpaRepository<User, UUID>, JpaSpecificationExe
 
     Optional<User> findByIdAndDeletedAtIsNull(UUID userId);
 
-    Optional<User> findByIdAndOrganizationId(UUID userId, UUID orgId);
+    Optional<User> findByIdAndOrganizationIdAndDeletedAtIsNull(UUID userId, UUID orgId);
 
     void deleteByIdAndOrganizationId(UUID userId, UUID orgId);
 

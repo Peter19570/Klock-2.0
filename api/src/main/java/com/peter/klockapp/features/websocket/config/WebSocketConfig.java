@@ -16,9 +16,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final WebSocketAuthInterceptor webSocketAuthInterceptor;
 
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws-klock")
-                .setAllowedOriginPatterns("*")
-                .withSockJS();
+        registry.addEndpoint("/api/v1/ws-klock")
+                .setAllowedOriginPatterns("*");
+//                .withSockJS();
     }
 
     public void configureMessageBroker(MessageBrokerRegistry registry) {
