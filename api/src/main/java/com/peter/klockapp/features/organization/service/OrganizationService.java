@@ -28,7 +28,7 @@ public class OrganizationService {
     private final OrganizationMapper organizationMapper;
     private final AuthService authService;
     private final UserService userService;
-    
+
     public OrganizationResponse createOrg(OrganizationRequest request){
         Organization organization = organizationRepo.save(organizationMapper.toEntity(request));
         AuthResponse authResponse = authService.register(request.registerRequest(), organization);
