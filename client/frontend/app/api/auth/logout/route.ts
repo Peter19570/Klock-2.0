@@ -1,0 +1,20 @@
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { API_BASE_URL, REFRESH_COOKIE_NAME } from "@/lib/api/config";
+
+export async function POST() {
+  const cookieStore = await cookies();
+  const refreshToken = cookieStore.get(REFRESH_COOKIE_NAME)?.value;
+
+  if (refreshToken) {
+    await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken }),
+    }).catch(() => {}); // best effort — cookie clears regardless
+  }
+
+  const res = NextResponse.json({ msg: "Logged out" });
+  res.cookies.delete(REFRESH_COOKIE_NAME);
+  return res;
+}

@@ -13,7 +13,6 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -21,7 +20,7 @@ public class CorsConfig {
         config.setAllowedMethods(CorsConstants.ALLOWED_METHODS);
         config.setAllowedHeaders(CorsConstants.ALLOWED_HEADERS);
         config.setExposedHeaders(CorsConstants.ALLOWED_EXPOSED_HEADERS);
-//        config.setAllowCredentials(true);
+        config.setAllowCredentials(true);
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

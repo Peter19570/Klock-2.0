@@ -7,7 +7,9 @@ public final class CorsConstants {
     private CorsConstants() {}
 
     // remember to set allowed credentials to false if using *
-    public static final List<String> ALLOWED_ORIGINS = List.of("*");
+    // public static final List<String> ALLOWED_ORIGINS = List.of("*");
+
+    public static final List<String> ALLOWED_ORIGINS = List.of("http://localhost:3000");
 
     public static final List<String> ALLOWED_HEADERS = List.of(
             "Authorization",
