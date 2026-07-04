@@ -50,12 +50,6 @@ public class BranchService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final UserService userService;
 
-    public Branch fetchBranch(CustomUserPrincipal principal, UUID branchId){
-        return branchRepo.findByOrganizationIdAndIdAndDeletedAtIsNull(
-                        principal.orgId(), branchId)
-                .orElseThrow(() -> new NotFoundException("Branch not found"));
-    }
-
     public BranchResponse createBranch(CustomUserPrincipal principal, BranchRequest request){
         User currentUser = userService.fetchCurrentUser(principal);
         Organization organization = currentUser.getOrganization();
@@ -129,14 +123,15 @@ public class BranchService {
     }
 
     public BranchResponse updateBranch(CustomUserPrincipal principal, UUID branchId, BranchRequest request){
-
         User currentUser = userService.fetchCurrentUser(principal);
 
-        Branch branch = branchRepo
-                .findByOrganizationIdAndIdAndDeletedAtIsNull(currentUser.getOrganization().getId(), branchId)
-                .orElseThrow(() -> new NotFoundException("Branch not found"));
-
         boolean isSuper = currentUser.getUserRole().equals(UserRole.SUPER_ADMIN);
+
+        UUID branchIdToUse = isSuper ? branchId : currentUser.getBranch().getId();
+
+        Branch branch = branchRepo
+                .findByOrganizationIdAndIdAndDeletedAtIsNull(currentUser.getOrganization().getId(), branchIdToUse)
+                .orElseThrow(() -> new NotFoundException("Branch not found"));
 
         if (branch.getBranchStatus() == BranchStatus.LOCKED && !isSuper) {
             throw new AuthorizationDeniedException("This branch configuration is locked by Super Admin");

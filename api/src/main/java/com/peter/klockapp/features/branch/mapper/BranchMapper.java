@@ -36,7 +36,6 @@ public interface BranchMapper {
 
     BranchUserResponse toDetailedUserDto(Branch branch);
 
-    @Mapping(target = "slug", expression = "java(request.displayName().toLowerCase().replace(\" \", \"-\"))")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntityFromRequest(BranchRequest request, @MappingTarget Branch branch);
 }
