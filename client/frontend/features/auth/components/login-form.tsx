@@ -11,7 +11,8 @@ import { backendFetch } from "@/lib/api/backend-client";
 import { getLandingRoute } from "@/lib/auth/rbac";
 import type { components } from "@/lib/api/generated/schema";
 
-type ApiResponseUserDetailedResponse = components["schemas"]["ApiResponseUserDetailedResponse"];
+type ApiResponseUserDetailedResponse =
+  components["schemas"]["ApiResponseUserDetailedResponse"];
 
 export function LoginForm() {
   const router = useRouter();
@@ -53,21 +54,42 @@ export function LoginForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-1.5">
         <Label htmlFor="email">Email</Label>
-        <Input id="email" type="email" placeholder="you@company.com" value={email}
-          onChange={(e) => setEmail(e.target.value)} required autoFocus />
+        <Input
+          id="email"
+          type="email"
+          placeholder="you@company.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoFocus
+        />
       </div>
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
           <Label htmlFor="password">Password</Label>
-          <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-foreground">
+          <Link
+            href="/forgot-password"
+            className="text-xs text-muted-foreground hover:text-foreground"
+          >
             Forgot password?
           </Link>
         </div>
-        <Input id="password" type="password" value={password}
-          onChange={(e) => setPassword(e.target.value)} required />
+        <Input
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
       </div>
-      {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-      <Button type="submit" disabled={loading}>{loading ? "Signing in..." : "Sign in"}</Button>
+      {error && (
+        <p role="alert" className="text-sm text-destructive">
+          {error}
+        </p>
+      )}
+      <Button type="submit" disabled={loading} className="w-full">
+        {loading ? "Signing in..." : "Sign in"}
+      </Button>
     </form>
   );
 }

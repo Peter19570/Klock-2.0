@@ -37,7 +37,9 @@ export function ResetPasswordForm() {
 
     if (!res.ok) {
       const payload = await res.json().catch(() => ({}));
-      setError(payload.msg ?? "This reset link has expired. Request a new one.");
+      setError(
+        payload.msg ?? "This reset link has expired. Request a new one.",
+      );
       setLoading(false);
       return;
     }
@@ -49,16 +51,33 @@ export function ResetPasswordForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-1.5">
         <Label htmlFor="newPassword">New password</Label>
-        <Input id="newPassword" type="password" value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)} required autoFocus />
+        <Input
+          id="newPassword"
+          type="password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          required
+          autoFocus
+        />
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="confirmPassword">Confirm password</Label>
-        <Input id="confirmPassword" type="password" value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)} required />
+        <Input
+          id="confirmPassword"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+        />
       </div>
-      {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-      <Button type="submit" disabled={loading}>{loading ? "Resetting..." : "Reset password"}</Button>
+      {error && (
+        <p role="alert" className="text-sm text-destructive">
+          {error}
+        </p>
+      )}
+      <Button type="submit" disabled={loading} className="w-full">
+        {loading ? "Resetting..." : "Reset password"}
+      </Button>
     </form>
   );
 }

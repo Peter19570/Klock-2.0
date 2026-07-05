@@ -1,8 +1,17 @@
-"use client";
-
-import { useAuthStore } from "@/store/auth-store";
+import { GreetingHero } from "@/features/attendance/components/greeting-hero";
+import { ClockCard } from "@/features/attendance/components/clock-card";
+import { LocationMap } from "@/features/attendance/components/location-map";
 
 export default function AttendancePage() {
-  const user = useAuthStore((s) => s.user);
-  return <p>Logged in as {user?.firstName} — role: {user?.userRole}</p>;
+  return (
+    <div className="pb-16">
+      <GreetingHero />
+      <section className="grid grid-cols-1 items-center justify-items-center gap-10 md:grid-cols-2">
+        <ClockCard />
+        <div className="flex h-[280px] w-full max-w-[360px] items-center justify-center">
+          <LocationMap />
+        </div>
+      </section>
+    </div>
+  );
 }

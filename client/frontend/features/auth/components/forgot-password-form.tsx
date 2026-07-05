@@ -27,7 +27,9 @@ export function ForgotPasswordForm() {
   if (submitted) {
     return (
       <p className="text-sm text-muted-foreground">
-        If an account exists for <span className="text-foreground">{email}</span>, a reset link is on its way.
+        If an account exists for{" "}
+        <span className="text-foreground">{email}</span>, a reset link is on its
+        way.
       </p>
     );
   }
@@ -36,10 +38,19 @@ export function ForgotPasswordForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-1.5">
         <Label htmlFor="email">Email</Label>
-        <Input id="email" type="email" placeholder="you@company.com" value={email}
-          onChange={(e) => setEmail(e.target.value)} required autoFocus />
+        <Input
+          id="email"
+          type="email"
+          placeholder="you@company.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoFocus
+        />
       </div>
-      <Button type="submit" disabled={loading}>{loading ? "Sending..." : "Send reset link"}</Button>
+      <Button type="submit" disabled={loading} className="w-full">
+        {loading ? "Sending..." : "Send reset link"}
+      </Button>
     </form>
   );
 }

@@ -161,7 +161,7 @@ export function RegisterForm() {
           {error}
         </p>
       )}
-      <Button type="submit" disabled={loading}>
+      <Button type="submit" disabled={loading} className="w-full">
         {loading ? "Creating account..." : "Create account"}
       </Button>
     </form>
