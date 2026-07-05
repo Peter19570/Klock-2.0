@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth-store";
 import { backendFetch } from "@/lib/api/backend-client";
 import { getLandingRoute } from "@/lib/auth/rbac";
@@ -30,14 +34,12 @@ export function LoginForm() {
     const payload = await res.json();
 
     if (!res.ok) {
-      setError(payload.msg ?? "Login failed");
+      setError(payload.msg ?? "Invalid email or password");
       setLoading(false);
       return;
     }
 
     useAuthStore.getState().setAccessToken(payload.accessToken);
-
-    // hit /users/me so the store shape always matches what bootstrap() produces
     const meRes = await backendFetch("/api/v1/users/me");
     const mePayload: ApiResponseUserDetailedResponse = await meRes.json();
     const resolvedUser = mePayload.data ?? payload.user;
@@ -48,17 +50,24 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="email">Email</label>
-        <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="space-y-1.5">
+        <Label htmlFor="email">Email</Label>
+        <Input id="email" type="email" placeholder="you@company.com" value={email}
+          onChange={(e) => setEmail(e.target.value)} required autoFocus />
       </div>
-      <div>
-        <label htmlFor="password">Password</label>
-        <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="password">Password</Label>
+          <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-foreground">
+            Forgot password?
+          </Link>
+        </div>
+        <Input id="password" type="password" value={password}
+          onChange={(e) => setPassword(e.target.value)} required />
       </div>
-      {error && <p role="alert">{error}</p>}
-      <button type="submit" disabled={loading}>{loading ? "Logging in..." : "Log in"}</button>
+      {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+      <Button type="submit" disabled={loading}>{loading ? "Signing in..." : "Sign in"}</Button>
     </form>
   );
 }
