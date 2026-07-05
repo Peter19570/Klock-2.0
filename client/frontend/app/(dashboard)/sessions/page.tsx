@@ -11,6 +11,7 @@ import type { components } from "@/lib/api/generated/schema";
 import { DatePicker } from "@/components/common/date-picker";
 import { EnumSelect } from "@/components/common/enum-select";
 import { cn } from "@/lib/utils";
+import { SlidersHorizontal } from "lucide-react";
 
 type PageResponseSessionResponse =
   components["schemas"]["PageResponseSessionResponse"];
@@ -27,6 +28,8 @@ export default function SessionsPage() {
     null,
   );
   const [loading, setLoading] = useState(true);
+
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -50,12 +53,15 @@ export default function SessionsPage() {
 
   const sessions = pageData?.content ?? [];
 
-  const hasActiveFilters =
-    !!filters.minWorkDate ||
-    !!filters.maxWorkDate ||
-    !!filters.arrivalStatus ||
-    !!filters.status ||
-    !!filters.sessionUser;
+  const activeFilterCount = [
+    filters.minWorkDate,
+    filters.maxWorkDate,
+    filters.arrivalStatus,
+    filters.status,
+    filters.sessionUser,
+  ].filter(Boolean).length;
+
+  const hasActiveFilters = activeFilterCount > 0;
 
   return (
     <div className="pb-16 pt-8">
@@ -68,10 +74,35 @@ export default function SessionsPage() {
           : "Your clock-in history."}
       </p>
 
+      <button
+        type="button"
+        onClick={() => setMobileFiltersOpen((v) => !v)}
+        className="mt-6 flex w-full items-center justify-between rounded-2xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground shadow-sm md:hidden"
+      >
+        <span className="flex items-center gap-2">
+          <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+          Filters
+          {activeFilterCount > 0 && (
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground">
+              {activeFilterCount}
+            </span>
+          )}
+        </span>
+        <span
+          className={cn(
+            "text-muted-foreground transition-transform",
+            mobileFiltersOpen && "rotate-180",
+          )}
+        >
+          ▾
+        </span>
+      </button>
+
       <div
         className={cn(
-          "mt-6 grid grid-cols-1 gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm sm:grid-cols-2 md:grid-cols-3",
+          "mt-4 grid-cols-1 gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm sm:grid-cols-2 md:mt-6 md:grid md:grid-cols-3",
           isStaffView ? "lg:grid-cols-6" : "lg:grid-cols-5",
+          mobileFiltersOpen ? "grid" : "hidden md:grid",
         )}
       >
         <div className="space-y-1.5">
