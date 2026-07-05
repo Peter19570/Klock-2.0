@@ -9,7 +9,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <ThemeProvider>
       <RoleGate>
         <Navbar />
-        <main className="mx-auto max-w-6xl px-4 sm:px-6">{children}</main>
+        <main className="mx-auto max-w-6xl px-4 pt-16 sm:px-6">{children}</main>
       </RoleGate>
     </ThemeProvider>
   );

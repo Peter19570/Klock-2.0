@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Fingerprint } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ButtonProps } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -14,7 +13,11 @@ interface ClockButtonProps extends Omit<ButtonProps, "onClick"> {
   successDuration?: number;
 }
 
-function SuccessParticles({ buttonRef }: { buttonRef: React.RefObject<HTMLButtonElement> }) {
+function SuccessParticles({
+  buttonRef,
+}: {
+  buttonRef: React.RefObject<HTMLButtonElement>;
+}) {
   const rect = buttonRef.current?.getBoundingClientRect();
   if (!rect) return null;
   const centerX = rect.left + rect.width / 2;
@@ -40,7 +43,13 @@ function SuccessParticles({ buttonRef }: { buttonRef: React.RefObject<HTMLButton
   );
 }
 
-export function ClockButton({ isClockedIn, onToggle, successDuration = 1000, className, ...props }: ClockButtonProps) {
+export function ClockButton({
+  isClockedIn,
+  onToggle,
+  successDuration = 1000,
+  className,
+  ...props
+}: ClockButtonProps) {
   const [showParticles, setShowParticles] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -58,10 +67,13 @@ export function ClockButton({ isClockedIn, onToggle, successDuration = 1000, cla
         onClick={handleClick}
         size="lg"
         variant={isClockedIn ? "destructive" : "default"}
-        className={cn("relative w-full gap-2 py-6 text-base transition-transform duration-100", showParticles && "scale-95", className)}
+        className={cn(
+          "relative w-full py-6 text-base transition-transform duration-100",
+          showParticles && "scale-95",
+          className,
+        )}
         {...props}
       >
-        <Fingerprint className="h-5 w-5" />
         {isClockedIn ? "Clock out" : "Clock in"}
       </Button>
     </>
