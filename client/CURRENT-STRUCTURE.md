@@ -23,6 +23,8 @@ client/
 │   │   │   │   └── page.tsx
 │   │   │   ├── organization
 │   │   │   │   └── page.tsx
+│   │   │   ├── sessions
+│   │   │   │   └── page.tsx
 │   │   │   └── layout.tsx
 │   │   ├── api
 │   │   │   └── auth
@@ -52,6 +54,7 @@ client/
 │   │   │   └── theme-toggle.tsx
 │   │   └── ui
 │   │       ├── button.tsx
+│   │       ├── dialog.tsx
 │   │       ├── dropdown-menu.tsx
 │   │       ├── input.tsx
 │   │       ├── label.tsx
@@ -63,19 +66,27 @@ client/
 │   │   │       ├── clock-card.tsx
 │   │   │       ├── greeting-hero.tsx
 │   │   │       └── location-map.tsx
-│   │   └── auth
+│   │   ├── auth
+│   │   │   └── components
+│   │   │       ├── forgot-password-form.tsx
+│   │   │       ├── login-form.tsx
+│   │   │       ├── register-form.tsx
+│   │   │       ├── reset-password-form.tsx
+│   │   │       └── verify-email-status.tsx
+│   │   └── sessions
 │   │       └── components
-│   │           ├── forgot-password-form.tsx
-│   │           ├── login-form.tsx
-│   │           ├── register-form.tsx
-│   │           ├── reset-password-form.tsx
-│   │           └── verify-email-status.tsx
+│   │           ├── clock-events-modal.tsx
+│   │           ├── recent-sessions.tsx
+│   │           └── session-table.tsx
+│   ├── hooks
+│   │   └── use-geolocation.ts
 │   ├── lib
 │   │   ├── api
 │   │   │   ├── generated
 │   │   │   │   └── schema.ts
 │   │   │   ├── backend-client.ts
-│   │   │   └── config.ts
+│   │   │   ├── config.ts
+│   │   │   └── sessions.ts
 │   │   ├── auth
 │   │   │   └── rbac.ts
 │   │   ├── theme
@@ -89,6 +100,8 @@ client/
 │   │   └── window.svg
 │   ├── store
 │   │   └── auth-store.ts
+│   ├── AGENTS.md
+│   ├── CLAUDE.md
 │   ├── components.json
 │   ├── eslint.config.mjs
 │   ├── middleware.ts
