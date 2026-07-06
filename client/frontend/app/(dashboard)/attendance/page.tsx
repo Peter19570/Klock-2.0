@@ -12,7 +12,7 @@ export default function AttendancePage() {
   return (
     <div className="pb-16">
       <GreetingHero />
-      <section className="grid grid-cols-1 items-center justify-items-center gap-10 md:grid-cols-2">
+      <section className="grid grid-cols-1 items-stretch justify-items-center gap-6 md:grid-cols-[1.3fr_1fr] md:items-center md:gap-4">
         <ClockCard />
         <div className="w-full max-w-[360px]">
           <LocationMap

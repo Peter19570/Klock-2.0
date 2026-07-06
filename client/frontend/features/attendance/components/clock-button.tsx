@@ -16,8 +16,9 @@ interface ClockButtonProps extends Omit<ButtonProps, "onClick"> {
 function SuccessParticles({
   buttonRef,
 }: {
-  buttonRef: React.RefObject<HTMLButtonElement>;
+  buttonRef: React.RefObject<HTMLButtonElement | null>;
 }) {
+  // eslint-disable-next-line react-hooks/refs
   const rect = buttonRef.current?.getBoundingClientRect();
   if (!rect) return null;
   const centerX = rect.left + rect.width / 2;
@@ -33,7 +34,9 @@ function SuccessParticles({
           initial={{ scale: 0, x: 0, y: 0 }}
           animate={{
             scale: [0, 1, 0],
+            // eslint-disable-next-line react-hooks/purity
             x: [0, (i % 2 ? 1 : -1) * (Math.random() * 50 + 20)],
+            // eslint-disable-next-line react-hooks/purity
             y: [0, -Math.random() * 50 - 20],
           }}
           transition={{ duration: 0.6, delay: i * 0.1, ease: "easeOut" }}
@@ -74,7 +77,13 @@ export function ClockButton({
         )}
         {...props}
       >
-        {isClockedIn ? "Clock out" : "Clock in"}
+        {props.disabled
+          ? isClockedIn
+            ? "Clocking out..."
+            : "Clocking in..."
+          : isClockedIn
+            ? "Clock out"
+            : "Clock in"}
       </Button>
     </>
   );

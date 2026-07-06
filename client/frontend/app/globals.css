@@ -149,7 +149,8 @@ html.dark {
   color-scheme: dark;
 }
 
-html, body {
+html,
+body {
   overscroll-behavior-y: none;
 }
 
@@ -157,4 +158,18 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+@keyframes klock-marquee {
+  0%,
+  15% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(var(--klock-marquee-shift));
+  }
+  85%,
+  100% {
+    transform: translateX(0);
+  }
 }

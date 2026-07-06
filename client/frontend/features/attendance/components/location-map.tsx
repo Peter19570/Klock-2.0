@@ -8,6 +8,7 @@ function usePointerFine() {
   const [fine, setFine] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia("(pointer: fine)");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFine(mq.matches);
     const handler = () => setFine(mq.matches);
     mq.addEventListener("change", handler);

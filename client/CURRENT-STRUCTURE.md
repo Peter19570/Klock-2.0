@@ -44,6 +44,10 @@ client/
 │   │   │   └── role-gate.tsx
 │   │   ├── brand
 │   │   │   └── klock-logo.tsx
+│   │   ├── common
+│   │   │   ├── date-picker.tsx
+│   │   │   ├── enum-select.tsx
+│   │   │   └── toast.tsx
 │   │   ├── layout
 │   │   │   ├── navbar.tsx
 │   │   │   └── profile-dropdown.tsx
@@ -54,28 +58,37 @@ client/
 │   │   │   └── theme-toggle.tsx
 │   │   └── ui
 │   │       ├── button.tsx
+│   │       ├── calendar.tsx
 │   │       ├── dialog.tsx
 │   │       ├── dropdown-menu.tsx
 │   │       ├── input.tsx
 │   │       ├── label.tsx
+│   │       ├── popover.tsx
+│   │       ├── select.tsx
 │   │       └── textarea.tsx
 │   ├── features
 │   │   ├── attendance
-│   │   │   └── components
-│   │   │       ├── clock-button.tsx
-│   │   │       ├── clock-card.tsx
-│   │   │       ├── greeting-hero.tsx
-│   │   │       └── location-map.tsx
+│   │   │   ├── components
+│   │   │   │   ├── clock-button.tsx
+│   │   │   │   ├── clock-card.tsx
+│   │   │   │   ├── greeting-hero.tsx
+│   │   │   │   └── location-map.tsx
+│   │   │   ├── hooks
+│   │   │   │   ├── use-attendance-session.ts
+│   │   │   │   └── use-geofence.ts
+│   │   │   └── api.ts
 │   │   ├── auth
-│   │   │   └── components
-│   │   │       ├── forgot-password-form.tsx
-│   │   │       ├── login-form.tsx
-│   │   │       ├── register-form.tsx
-│   │   │       ├── reset-password-form.tsx
-│   │   │       └── verify-email-status.tsx
+│   │   │   ├── components
+│   │   │   │   ├── force-password-change-dialog.tsx
+│   │   │   │   ├── forgot-password-form.tsx
+│   │   │   │   ├── login-form.tsx
+│   │   │   │   ├── register-form.tsx
+│   │   │   │   ├── reset-password-form.tsx
+│   │   │   │   └── verify-email-status.tsx
+│   │   │   └── api.ts
 │   │   └── sessions
 │   │       └── components
-│   │           ├── clock-events-modal.tsx
+│   │           ├── clock-events-subtable.tsx
 │   │           ├── recent-sessions.tsx
 │   │           └── session-table.tsx
 │   ├── hooks
@@ -84,6 +97,7 @@ client/
 │   │   ├── api
 │   │   │   ├── generated
 │   │   │   │   └── schema.ts
+│   │   │   ├── api-error.ts
 │   │   │   ├── backend-client.ts
 │   │   │   ├── config.ts
 │   │   │   └── sessions.ts
@@ -91,6 +105,7 @@ client/
 │   │   │   └── rbac.ts
 │   │   ├── theme
 │   │   │   └── theme-provider.tsx
+│   │   ├── device-id.ts
 │   │   └── utils.ts
 │   ├── public
 │   │   ├── file.svg
