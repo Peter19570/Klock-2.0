@@ -113,7 +113,7 @@ public class ClockEventService {
                 Map.of(
                         "message", "User clocked in",
                         "deviceId", request.deviceId(),
-                        "gps accuracy", request.accuracy(),
+                        "gpsAccuracy", request.accuracy(),
                         "batteryLevel", request.batteryLevel(),
 //                        "signalStrength", request.signalStrength(),
                         "clientTimeStamp", request.clientTimeStamp(),
