@@ -29,7 +29,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/sessions")
 @RequiredArgsConstructor
-@Tag(name = "Session")
+@Tag(name = "Session", description = "Get, terminate, export session here...")
 public class SessionController {
 
     private final SessionService sessionService;

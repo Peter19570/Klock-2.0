@@ -21,7 +21,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/dashboard")
 @RequiredArgsConstructor
-@Tag(name = "Dashboard")
+@Tag(name = "Dashboard", description = "Provides a summary overview of the activities happening in the organization")
 public class DashboardController {
 
     private final DashboardService dashboardService;

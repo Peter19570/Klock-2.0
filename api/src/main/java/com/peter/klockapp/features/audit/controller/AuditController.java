@@ -27,7 +27,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/audits")
 @RequiredArgsConstructor
-@Tag(name = "Audit-Log", description = "Allows for filtering in audits")
+@Tag(name = "Audit-Log", description = "Allows for filtering in audits for the super admins")
 public class AuditController {
 
     private final AuditService auditService;

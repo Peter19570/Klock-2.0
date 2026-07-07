@@ -19,7 +19,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/avatar")
 @RequiredArgsConstructor
-@Tag(name = "Avatar")
+@Tag(name = "Avatar", description = "Handles profile photo uploads with Cloudinary as storage provider")
 public class AvatarController {
 
     private final AvatarService avatarService;

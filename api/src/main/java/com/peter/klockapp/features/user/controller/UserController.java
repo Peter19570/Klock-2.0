@@ -33,7 +33,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
-@Tag(name = "User")
+@Tag(name = "User", description = "All user related actions happen here and is managed here as well")
 public class UserController {
 
     private final UserService userService;

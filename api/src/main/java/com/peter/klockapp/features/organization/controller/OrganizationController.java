@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/organization")
 @RequiredArgsConstructor
-@Tag(name = "Organization")
+@Tag(name = "Organization", description = "Management of organizations done her by the Super Admins")
 public class OrganizationController {
 
     private final OrganizationService organizationService;

@@ -28,7 +28,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/branches")
 @RequiredArgsConstructor
-@Tag(name = "Branch")
+@Tag(name = "Branch", description = "Manage the branches with this APIs, Done by Admins and Super Admins")
 public class BranchController {
 
     private final BranchService branchService;

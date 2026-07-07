@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/attendance")
 @RequiredArgsConstructor
-@Tag(name = "Clock Event")
+@Tag(name = "Clock Event", description = "Performs the actual attendance and manages them")
 public class ClockEventController {
 
     private final ClockEventService clockEventService;
