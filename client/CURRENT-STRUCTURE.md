@@ -72,7 +72,9 @@ client/
 │   │   │   │   ├── clock-button.tsx
 │   │   │   │   ├── clock-card.tsx
 │   │   │   │   ├── greeting-hero.tsx
-│   │   │   │   └── location-map.tsx
+│   │   │   │   ├── location-map.tsx
+│   │   │   │   ├── marquee-text.tsx
+│   │   │   │   └── status-pill.tsx
 │   │   │   ├── hooks
 │   │   │   │   ├── use-attendance-session.ts
 │   │   │   │   └── use-geofence.ts
@@ -105,6 +107,7 @@ client/
 │   │   │   └── rbac.ts
 │   │   ├── theme
 │   │   │   └── theme-provider.tsx
+│   │   ├── attendance-events.ts
 │   │   ├── device-id.ts
 │   │   └── utils.ts
 │   ├── public

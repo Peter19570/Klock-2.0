@@ -14,7 +14,7 @@ export function getLandingRoute(role: UserRole): string {
 
 export const ROUTE_ROLES: Record<string, UserRole[]> = {
   "/dashboard": ["ADMIN", "SUPER_ADMIN"],
-  "/attendance": ["USER", "ADMIN", "SUPER_ADMIN"],
+  "/attendance": ["USER"],
   "/sessions": ["USER", "ADMIN", "SUPER_ADMIN"],
   "/branches": ["ADMIN", "SUPER_ADMIN"],
   "/users": ["ADMIN", "SUPER_ADMIN"],
