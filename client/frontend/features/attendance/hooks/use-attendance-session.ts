@@ -8,6 +8,7 @@ import { useGeofenceWatcher, clearGeofenceCountdown } from "./use-geofence";
 import type { components } from "@/lib/api/generated/schema";
 import { getOrCreateDeviceId } from "@/lib/device-id";
 import { emitAttendanceChanged } from "@/lib/attendance-events";
+import { useBranchSocket } from "./use-branch-socket";
 import {
   clockIn,
   clockOut,
@@ -209,6 +210,12 @@ export function useAttendanceSession() {
   const geofence = useGeofenceWatcher(activeBranch, clockedIn === true, () => {
     handleClockOut("AUTOMATIC");
   });
+
+const handleBranchUpdate = useCallback((payload: BranchUserResponse) => {
+  setActiveBranch(payload);
+}, []);
+
+useBranchSocket(activeBranch?.id, clockedIn === true, handleBranchUpdate);
 
   return {
     isClockedIn: clockedIn,

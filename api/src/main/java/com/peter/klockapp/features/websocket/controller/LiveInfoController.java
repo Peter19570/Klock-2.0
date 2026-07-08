@@ -6,6 +6,7 @@ import com.peter.klockapp.features.websocket.dto.response.LiveUserInfoResponse;
 import com.peter.klockapp.features.websocket.service.LiveInfoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

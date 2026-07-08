@@ -46,6 +46,7 @@ function readStoredDeadline(branchId: string): number | null {
 
 function writeStoredDeadline(branchId: string, deadline: number) {
   try {
+    console.log("[geofence] wrote deadline", branchId, new Date(deadline).toISOString());
     sessionStorage.setItem(deadlineKey(branchId), String(deadline));
   } catch {
     // sessionStorage unavailable (private mode etc.) — countdown just won't survive a refresh
@@ -58,6 +59,7 @@ function writeStoredDeadline(branchId: string, deadline: number) {
 export function clearGeofenceCountdown(branchId: string | null | undefined) {
   if (!branchId) return;
   try {
+    console.log("[geofence] cleared deadline", branchId, new Error().stack);
     sessionStorage.removeItem(deadlineKey(branchId));
   } catch {
     // ignore
@@ -78,6 +80,12 @@ export function useGeofenceWatcher(
   const deadlineRef = useRef<number | null>(null);
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const firedRef = useRef(false);
+  const branchRef = useRef(branch);
+
+  // keep the ref current on every render without restarting the watch effect
+  useEffect(() => {
+    branchRef.current = branch;
+  }, [branch]);
 
   useEffect(() => {
     if (!enabled || !branch?.latitude || !branch?.longitude || !branch?.radius) {
@@ -100,7 +108,8 @@ export function useGeofenceWatcher(
     }
 
     function startCountdown() {
-      const timeoutMs = (branch!.geofenceExitTimeoutMinutes ?? 5) * 60_000;
+      const current = branchRef.current!;
+      const timeoutMs = (current.geofenceExitTimeoutMinutes ?? 5) * 60_000;
       const stored = readStoredDeadline(branchId);
       const deadline = stored ?? Date.now() + timeoutMs;
       deadlineRef.current = deadline;
@@ -124,10 +133,11 @@ export function useGeofenceWatcher(
 
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
+        const current = branchRef.current!;
         const { latitude, longitude } = position.coords;
         lastKnownPosition.current = { lat: latitude, lon: longitude };
-        const distance = distanceMeters(latitude, longitude, branch.latitude!, branch.longitude!);
-        const inside = distance <= branch.radius!;
+        const distance = distanceMeters(latitude, longitude, current.latitude!, current.longitude!);
+        const inside = distance <= current.radius!;
 
         setState((s) => ({ ...s, insideGeofence: inside }));
 
@@ -139,14 +149,10 @@ export function useGeofenceWatcher(
           startCountdown();
         }
       },
-      () => {
-        // geolocation failures here shouldn't interrupt an active session
-      },
+      () => {},
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 },
     );
 
-    // resume a countdown that was already running before a refresh, even
-    // before the first watchPosition callback comes back in
     if (readStoredDeadline(branchId)) {
       setState((s) => ({ ...s, insideGeofence: false }));
       startCountdown();
