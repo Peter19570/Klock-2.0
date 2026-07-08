@@ -7,6 +7,7 @@ import com.peter.klockapp.features.auth.exceptions.ValidationException;
 import com.peter.klockapp.features.session.exceptions.WriteToCSVException;
 import com.peter.klockapp.features.shared.dto.ApiResponse;
 import org.apache.coyote.BadRequestException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,10 @@ public class GlobalExceptionHandler {
                                 + " Error Info: " + ex.getMessage()));
     }
 
-    @ExceptionHandler(AlreadyExistException.class)
+    @ExceptionHandler({
+            AlreadyExistException.class,
+            DataIntegrityViolationException.class
+    })
     public ResponseEntity<ApiResponse<String>> handleConflictException(Exception ex){
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
