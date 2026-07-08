@@ -77,6 +77,7 @@ client/
 │   │   │   │   └── status-pill.tsx
 │   │   │   ├── hooks
 │   │   │   │   ├── use-attendance-session.ts
+│   │   │   │   ├── use-branch-socket.ts
 │   │   │   │   └── use-geofence.ts
 │   │   │   └── api.ts
 │   │   ├── auth
@@ -107,6 +108,8 @@ client/
 │   │   │   └── rbac.ts
 │   │   ├── theme
 │   │   │   └── theme-provider.tsx
+│   │   ├── websocket
+│   │   │   └── stomp-client.ts
 │   │   ├── attendance-events.ts
 │   │   ├── device-id.ts
 │   │   └── utils.ts
