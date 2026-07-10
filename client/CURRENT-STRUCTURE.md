@@ -68,6 +68,7 @@ frontend/
 │       ├── avatar.tsx
 │       ├── button.tsx
 │       ├── calendar.tsx
+│       ├── chart.tsx
 │       ├── dialog.tsx
 │       ├── dropdown-menu.tsx
 │       ├── input.tsx
@@ -101,6 +102,14 @@ frontend/
 │   │   │   ├── reset-password-form.tsx
 │   │   │   └── verify-email-status.tsx
 │   │   └── api.ts
+│   ├── dashboard
+│   │   ├── components
+│   │   │   ├── clock-out-pie-chart.tsx
+│   │   │   ├── dashboard-stats.tsx
+│   │   │   ├── session-trend-chart.tsx
+│   │   │   └── stat-card.tsx
+│   │   └── hooks
+│   │       └── use-dashboard-data.ts
 │   └── sessions
 │       └── components
 │           ├── clock-events-subtable.tsx
@@ -116,6 +125,7 @@ frontend/
 │   │   ├── api.ts
 │   │   ├── backend-client.ts
 │   │   ├── config.ts
+│   │   ├── dashboard.ts
 │   │   └── sessions.ts
 │   ├── auth
 │   │   └── rbac.ts
