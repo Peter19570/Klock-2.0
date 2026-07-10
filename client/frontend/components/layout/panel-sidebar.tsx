@@ -194,7 +194,7 @@ export function PanelSidebar() {
             className="flex h-full flex-col"
           >
             <div className="flex grow flex-col items-center">
-              <div className="flex h-13.5 w-full shrink-0 items-center border-b border-sidebar-border p-2">
+              <div className="flex h-16 w-full shrink-0 items-center border-b border-sidebar-border p-2">
                 <div className="mt-[1.5px] flex w-full items-center gap-2 px-2">
                   <Avatar className="size-6 rounded">
                     <AvatarFallback>K</AvatarFallback>
@@ -245,29 +245,38 @@ export function PanelSidebar() {
               exit={{ x: "-100%" }}
               transition={{ type: "tween", ease: "easeOut", duration: 0.2 }}
             >
-              <div className="flex h-13.5 w-full shrink-0 items-center justify-between border-b border-sidebar-border p-2 px-3">
-                <div className="flex items-center gap-2">
-                  <Avatar className="size-6 rounded">
-                    <AvatarFallback>K</AvatarFallback>
-                  </Avatar>
-                  <p className="text-sm font-medium">Klock</p>
+              <motion.ul
+                variants={staggerVariants}
+                initial="closed"
+                animate="open"
+                className="flex h-full flex-col"
+              >
+                <div className="flex h-13.5 w-full shrink-0 items-center justify-between border-b border-sidebar-border p-2 px-3">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="size-6 rounded">
+                      <AvatarFallback>K</AvatarFallback>
+                    </Avatar>
+                    <motion.li variants={variants}>
+                      <p className="text-sm font-medium">Klock</p>
+                    </motion.li>
+                  </div>
+                  <button onClick={closeMobile} aria-label="Close menu">
+                    <X className="h-5 w-5" />
+                  </button>
                 </div>
-                <button onClick={closeMobile} aria-label="Close menu">
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
 
-              <div className="flex grow flex-col gap-4">
-                <ScrollArea className="grow p-2">
-                  <NavLinks isCollapsed={false} onNavigate={closeMobile} />
-                </ScrollArea>
-              </div>
-              <AccountBlock
-                isCollapsed={false}
-                name={name}
-                email={email}
-                initials={initials}
-              />
+                <div className="flex grow flex-col gap-4">
+                  <ScrollArea className="grow p-2">
+                    <NavLinks isCollapsed={false} onNavigate={closeMobile} />
+                  </ScrollArea>
+                </div>
+                <AccountBlock
+                  isCollapsed={false}
+                  name={name}
+                  email={email}
+                  initials={initials}
+                />
+              </motion.ul>
             </motion.div>
           </>
         )}
