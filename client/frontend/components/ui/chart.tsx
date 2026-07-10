@@ -296,7 +296,7 @@ function ChartLegendContent({
                 }}
               />
             )}
-            {itemConfig?.label}
+            <span className="whitespace-nowrap">{itemConfig?.label}</span>
           </div>
         );
       })}

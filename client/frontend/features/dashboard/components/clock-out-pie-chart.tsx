@@ -35,8 +35,8 @@ export function ClockOutPieChart({ stats }: ClockOutPieChartProps) {
   const hasData = total > 0;
 
   return (
-    <div className="flex h-64 w-full flex-col gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm transition-colors hover:border-foreground/10 sm:h-80 sm:p-6 lg:h-116.25 lg:w-90 lg:shrink-0">
-      <div>
+    <div className="flex h-64 w-full flex-col gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm transition-colors hover:border-foreground/10 sm:h-80 sm:p-6 lg:h-116.25 lg:min-w-90 lg:flex-[3]">
+      <div className="shrink-0">
         <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Clock-out breakdown
         </span>
@@ -47,30 +47,36 @@ export function ClockOutPieChart({ stats }: ClockOutPieChartProps) {
 
       {hasData ? (
         <>
-          <ChartContainer
-            config={chartConfig}
-            className="mx-auto h-32 w-32 sm:h-48 sm:w-48 lg:h-70 lg:w-70"
-          >
-            <PieChart>
-              <ChartTooltip
-                content={<ChartTooltipContent hideLabel nameKey="key" />}
-              />
-              <Pie
-                data={data}
-                dataKey="value"
-                nameKey="key"
-                innerRadius={55}
-                strokeWidth={4}
-              >
-                {data.map((entry) => (
-                  <Cell key={entry.key} fill={`var(--color-${entry.key})`} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ChartContainer>
+          <div className="flex min-h-0 flex-1 items-center justify-center">
+            <ChartContainer
+              config={chartConfig}
+              className="mx-auto aspect-square h-full max-h-60 w-60 sm:max-h-52 sm:w-52 lg:max-h-70 lg:w-70"
+            >
+              <PieChart>
+                <ChartTooltip
+                  content={<ChartTooltipContent hideLabel nameKey="key" />}
+                />
+                <Pie
+                  data={data}
+                  dataKey="value"
+                  nameKey="key"
+                  innerRadius="55%"
+                  outerRadius="95%"
+                  cornerRadius={12}
+                  paddingAngle={6}
+                  stroke="none"
+                >
+                  {data.map((entry) => (
+                    <Cell key={entry.key} fill={`var(--color-${entry.key})`} />
+                  ))}
+                </Pie>
+                <ChartLegend content={<ChartLegendContent nameKey="key" />} />
+              </PieChart>
+            </ChartContainer>
+          </div>
           <ChartLegend
             content={<ChartLegendContent nameKey="key" payload={undefined} />}
-            className="flex-wrap"
+            className="shrink-0 flex-wrap"
           />
         </>
       ) : (
