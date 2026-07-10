@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth-store";
 import { backendFetch } from "@/lib/api/backend-client";
+import { syncDeviceIdIfNeeded } from "@/lib/api/api";
 import { getLandingRoute } from "@/lib/auth/rbac";
 import type { components } from "@/lib/api/generated/schema";
 
@@ -46,6 +47,7 @@ export function LoginForm() {
     const resolvedUser = mePayload.data ?? payload.user;
 
     setAuth(payload.accessToken, resolvedUser);
+    void syncDeviceIdIfNeeded(resolvedUser.hasSetDevice);
     setLoading(false);
     router.push(getLandingRoute(resolvedUser.userRole!));
   }

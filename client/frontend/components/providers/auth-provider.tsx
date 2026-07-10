@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useAuthStore } from "@/store/auth-store";
 import { backendFetch, refreshAccessToken } from "@/lib/api/backend-client";
+import { syncDeviceIdIfNeeded } from "@/lib/api/api";
 import type { components } from "@/lib/api/generated/schema";
 
 type ApiResponseUserDetailedResponse =
@@ -33,7 +34,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       const payload: ApiResponseUserDetailedResponse = await meRes.json();
-      if (payload.data) setAuth(accessToken, payload.data);
+      if (payload.data) {
+        setAuth(accessToken, payload.data);
+        void syncDeviceIdIfNeeded(payload.data.hasSetDevice);
+      }
     }
 
     bootstrap();

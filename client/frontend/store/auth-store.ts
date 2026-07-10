@@ -1,14 +1,14 @@
 import { create } from "zustand";
 import type { components } from "@/lib/api/generated/schema";
 
-type UserResponse = components["schemas"]["UserResponse"];
+type UserDetailedResponse = components["schemas"]["UserDetailedResponse"];
 type AuthStatus = "idle" | "loading" | "authenticated" | "unauthenticated";
 
 interface AuthState {
   accessToken: string | null;
-  user: UserResponse | null;
+  user: UserDetailedResponse | null;
   status: AuthStatus;
-  setAuth: (accessToken: string, user: UserResponse) => void;
+  setAuth: (accessToken: string, user: UserDetailedResponse) => void;
   setAccessToken: (accessToken: string) => void;
   clearAuth: () => void;
   setStatus: (status: AuthStatus) => void;

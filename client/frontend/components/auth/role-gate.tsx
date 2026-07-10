@@ -12,7 +12,8 @@ export function RoleGate({ children }: { children: React.ReactNode }) {
   const role = useAuthStore((s) => s.user?.userRole);
 
   const allowedRoles = getAllowedRoles(pathname);
-  const isRoleBlocked = !!allowedRoles && !!role && !allowedRoles.includes(role);
+  const isRoleBlocked =
+    !!allowedRoles && !!role && !allowedRoles.includes(role);
 
   useEffect(() => {
     if (status === "idle" || status === "loading") return;
@@ -28,7 +29,7 @@ export function RoleGate({ children }: { children: React.ReactNode }) {
   }, [status, role, isRoleBlocked, pathname, router]);
 
   if (status === "idle" || status === "loading") return <p>Loading...</p>;
-  if (status === "unauthenticated") return null; // redirect in flight, don't flash the page
+  if (status === "unauthenticated") return null;
   if (isRoleBlocked) return null;
 
   return <>{children}</>;
