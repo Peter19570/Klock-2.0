@@ -43,10 +43,10 @@ export function Navbar({ fullWidth = false }: { fullWidth?: boolean }) {
               <KlockLogo />
             </Link>
 
-            {/* desktop: profile + toggle far left (sidebar already carries the brand) */}
-            <div className="hidden items-center gap-3 md:flex">
-              <ProfileDropdown />
+            {/* desktop: theme toggle, then profile pinned to the far right */}
+            <div className="hidden items-center gap-3 md:ml-auto md:flex">
               <AnimatedThemeToggle className="hidden sm:inline-flex" />
+              <ProfileDropdown />
             </div>
 
             {/* mobile: profile right */}

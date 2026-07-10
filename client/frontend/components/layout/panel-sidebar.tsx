@@ -29,7 +29,7 @@ const contentVariants = {
   closed: { display: "block", opacity: 1 },
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// label slide/fade-in animation — now actually used below
 const variants = {
   open: {
     x: 0,
@@ -71,7 +71,9 @@ function AccountBlock({
         className="flex h-8 w-full flex-row items-center rounded-md px-2 py-1.5 transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
       >
         <Settings className="h-4 w-4 shrink-0" />
-        {!isCollapsed && <p className="ml-2 text-sm font-medium">Settings</p>}
+        <motion.span variants={variants}>
+          {!isCollapsed && <p className="ml-2 text-sm font-medium">Settings</p>}
+        </motion.span>
       </Link>
 
       <DropdownMenu modal={false}>
@@ -80,12 +82,17 @@ function AccountBlock({
             <Avatar className="size-4">
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
-            {!isCollapsed && (
-              <div className="flex w-full items-center gap-2">
-                <p className="text-sm font-medium">{name ?? "Account"}</p>
-                <ChevronsUpDown className="ml-auto h-4 w-4 text-(--sidebar-foreground)/50" />
-              </div>
-            )}
+            <motion.span
+              variants={variants}
+              className="flex w-full items-center gap-2"
+            >
+              {!isCollapsed && (
+                <>
+                  <p className="text-sm font-medium">{name ?? "Account"}</p>
+                  <ChevronsUpDown className="ml-auto h-4 w-4 text-(--sidebar-foreground)/50" />
+                </>
+              )}
+            </motion.span>
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent sideOffset={5}>
@@ -145,9 +152,11 @@ function NavLinks({
             )}
           >
             <Icon className="h-4 w-4 shrink-0" />
-            {!isCollapsed && (
-              <p className="ml-2 text-sm font-medium">{label}</p>
-            )}
+            <motion.span variants={variants}>
+              {!isCollapsed && (
+                <p className="ml-2 text-sm font-medium">{label}</p>
+              )}
+            </motion.span>
           </Link>
         );
       })}
@@ -190,7 +199,11 @@ export function PanelSidebar() {
                   <Avatar className="size-6 rounded">
                     <AvatarFallback>K</AvatarFallback>
                   </Avatar>
-                  {!isCollapsed && <p className="text-sm font-medium">Klock</p>}
+                  <motion.li variants={variants}>
+                    {!isCollapsed && (
+                      <p className="text-sm font-medium">Klock</p>
+                    )}
+                  </motion.li>
                 </div>
               </div>
 

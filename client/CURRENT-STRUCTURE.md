@@ -18,11 +18,19 @@ frontend/
 │   ├── (dashboard)
 │   │   ├── attendance
 │   │   │   └── page.tsx
+│   │   ├── audits
+│   │   │   └── page.tsx
+│   │   ├── branches
+│   │   │   └── page.tsx
 │   │   ├── dashboard
+│   │   │   └── page.tsx
+│   │   ├── live-map
 │   │   │   └── page.tsx
 │   │   ├── organization
 │   │   │   └── page.tsx
 │   │   ├── sessions
+│   │   │   └── page.tsx
+│   │   ├── users
 │   │   │   └── page.tsx
 │   │   └── layout.tsx
 │   ├── api
@@ -49,6 +57,7 @@ frontend/
 │   │   └── toast.tsx
 │   ├── layout
 │   │   ├── navbar.tsx
+│   │   ├── panel-sidebar.tsx
 │   │   └── profile-dropdown.tsx
 │   ├── providers
 │   │   └── auth-provider.tsx
@@ -56,6 +65,7 @@ frontend/
 │   │   ├── force-theme.tsx
 │   │   └── theme-toggle.tsx
 │   └── ui
+│       ├── avatar.tsx
 │       ├── button.tsx
 │       ├── calendar.tsx
 │       ├── dialog.tsx
@@ -63,8 +73,11 @@ frontend/
 │       ├── input.tsx
 │       ├── label.tsx
 │       ├── popover.tsx
+│       ├── scroll-area.tsx
 │       ├── select.tsx
 │       └── textarea.tsx
+├── config
+│   └── nav.ts
 ├── features
 │   ├── attendance
 │   │   ├── components
@@ -120,7 +133,8 @@ frontend/
 │   ├── vercel.svg
 │   └── window.svg
 ├── store
-│   └── auth-store.ts
+│   ├── auth-store.ts
+│   └── ui-store.ts
 ├── AGENTS.md
 ├── CLAUDE.md
 ├── components.json
