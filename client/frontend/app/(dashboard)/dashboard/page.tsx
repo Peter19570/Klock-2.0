@@ -13,19 +13,27 @@ export default function DashboardPage() {
 
   if (loading || !data) {
     return (
-      <p className="p-6 text-sm text-muted-foreground">Loading dashboard...</p>
+      <p className="pb-16 pt-8 text-sm text-muted-foreground">
+        Loading dashboard...
+      </p>
     );
   }
 
-  const recentSessions = (data.recentSessions ?? []).slice(0, 15);
+  const recentSessions = [...(data.recentSessions ?? [])]
+    .sort((a, b) => {
+      const dateA = a.workDate ? new Date(a.workDate).getTime() : 0;
+      const dateB = b.workDate ? new Date(b.workDate).getTime() : 0;
+      return dateB - dateA; // newest first
+    })
+    .slice(0, 15);
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 pb-16 pt-8">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           Welcome back, {user?.firstName}
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="mt-1 text-sm text-muted-foreground">
           Here&apos;s what&apos;s happening{" "}
           {role === "SUPER_ADMIN"
             ? "across the organization"
@@ -36,7 +44,7 @@ export default function DashboardPage() {
 
       <DashboardStats role={role} data={data} />
 
-      <div className="flex flex-wrap gap-6">
+      <div className="flex flex-col gap-6 lg:flex-row">
         <SessionTrendChart data={data.sessionTrend ?? []} />
         <ClockOutPieChart stats={data.clockOutStats} />
       </div>

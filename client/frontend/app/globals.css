@@ -141,6 +141,14 @@
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 html {
   background: var(--background);
   color-scheme: light;

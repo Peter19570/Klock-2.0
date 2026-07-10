@@ -10,16 +10,27 @@ interface SessionTrendChartProps {
   data: SessionTrend[];
 }
 
+const MIN_BAR_PX = 6;
+const MIN_VALUE_BAR_PX = 18;
+const MAX_BAR_PX = 240;
+
 export function SessionTrendChart({ data }: SessionTrendChartProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [displayValue, setDisplayValue] = useState<number | null>(null);
   const [isHovering, setIsHovering] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const points = data.map((d) => ({
     label: d.dayLabel ?? "",
     value: d.count ?? 0,
   }));
   const maxValue = Math.max(1, ...points.map((d) => d.value));
+  const todayIndex = points.length - 1; // assumes chronological, last = today
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   useEffect(() => {
     if (hoveredIndex !== null)
@@ -34,11 +45,16 @@ export function SessionTrendChart({ data }: SessionTrendChartProps) {
     setTimeout(() => setDisplayValue(null), 150);
   };
 
+  const barHeight = (value: number) => {
+    if (value <= 0) return MIN_BAR_PX;
+    return Math.max((value / maxValue) * MAX_BAR_PX, MIN_VALUE_BAR_PX);
+  };
+
   return (
     <div
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={handleLeave}
-      className="group relative flex h-116.25 w-181.25 max-w-full flex-col gap-6 rounded-2xl border border-border bg-card p-6 shadow-sm transition-colors hover:border-foreground/10"
+      className="group relative flex h-64 w-full flex-col gap-6 rounded-2xl border border-border bg-card p-4 shadow-sm transition-colors hover:border-foreground/10 sm:h-80 sm:p-6 lg:h-116.25 lg:max-w-250 lg:flex-1"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -69,34 +85,41 @@ export function SessionTrendChart({ data }: SessionTrendChartProps) {
         </div>
       </div>
 
-      <div className="flex h-full items-end gap-3 pb-6">
+      <div className="flex h-full items-end gap-1.5 pb-6 sm:gap-3">
         {points.map((item, index) => {
-          const heightPx = (item.value / maxValue) * 260;
+          const heightPx = barHeight(item.value);
           const isHovered = hoveredIndex === index;
           const isAnyHovered = hoveredIndex !== null;
           const isNeighbor =
             isAnyHovered &&
             (index === hoveredIndex - 1 || index === hoveredIndex + 1);
+          const isToday = index === todayIndex;
 
           return (
             <div
               key={`${item.label}-${index}`}
               className="relative flex h-full flex-1 flex-col items-center justify-end"
               onMouseEnter={() => setHoveredIndex(index)}
+              onClick={() =>
+                setHoveredIndex((prev) => (prev === index ? null : index))
+              }
             >
               <div
                 className={cn(
-                  "w-full origin-bottom cursor-pointer rounded-full transition-all duration-300 ease-out",
+                  "w-full origin-bottom cursor-pointer rounded-t-lg transition-[height,transform,background-color] duration-500 ease-out",
                   isHovered
                     ? "bg-primary"
                     : isNeighbor
                       ? "bg-primary/40"
                       : isAnyHovered
                         ? "bg-primary/15"
-                        : "bg-primary/25 group-hover:bg-primary/30",
+                        : isToday
+                          ? "bg-primary/50 group-hover:bg-primary/40"
+                          : "bg-primary/25 group-hover:bg-primary/30",
                 )}
                 style={{
-                  height: `${heightPx}px`,
+                  height: mounted ? `${heightPx}px` : "0px",
+                  transitionDelay: mounted ? `${index * 30}ms` : "0ms",
                   transform: isHovered
                     ? "scaleX(1.1) scaleY(1.02)"
                     : isNeighbor
@@ -106,8 +129,12 @@ export function SessionTrendChart({ data }: SessionTrendChartProps) {
               />
               <span
                 className={cn(
-                  "mt-3 text-xs font-medium transition-all duration-300",
-                  isHovered ? "text-foreground" : "text-muted-foreground/60",
+                  "mt-3 text-[10px] font-medium transition-all duration-300 sm:text-xs",
+                  isHovered
+                    ? "text-foreground"
+                    : isToday
+                      ? "text-primary/70"
+                      : "text-muted-foreground/60",
                 )}
               >
                 {item.label}
