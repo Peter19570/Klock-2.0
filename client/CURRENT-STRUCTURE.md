@@ -116,7 +116,10 @@ frontend/
 │           ├── recent-sessions.tsx
 │           └── session-table.tsx
 ├── hooks
-│   └── use-geolocation.ts
+│   ├── use-auto-marquee.ts
+│   ├── use-count-up.ts
+│   ├── use-geolocation.ts
+│   └── use-is-mobile.ts
 ├── lib
 │   ├── api
 │   │   ├── generated

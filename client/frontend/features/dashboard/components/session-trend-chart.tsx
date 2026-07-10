@@ -3,16 +3,13 @@
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import type { components } from "@/lib/api/generated/schema";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 
 type SessionTrend = components["schemas"]["SessionTrend"];
 
 interface SessionTrendChartProps {
   data: SessionTrend[];
 }
-
-const MIN_BAR_PX = 6;
-const MIN_VALUE_BAR_PX = 18;
-const MAX_BAR_PX = 240;
 
 export function SessionTrendChart({ data }: SessionTrendChartProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -26,6 +23,11 @@ export function SessionTrendChart({ data }: SessionTrendChartProps) {
   }));
   const maxValue = Math.max(1, ...points.map((d) => d.value));
   const todayIndex = points.length - 1; // assumes chronological, last = today
+
+  const isMobile = useIsMobile();
+  const MAX_HEIGHT_PCT = isMobile ? 84 : 250;
+  const MIN_VALUE_HEIGHT_PCT = isMobile ? 16 : 14;
+  const MIN_HEIGHT_PCT = 4;
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => setMounted(true));
@@ -46,8 +48,8 @@ export function SessionTrendChart({ data }: SessionTrendChartProps) {
   };
 
   const barHeight = (value: number) => {
-    if (value <= 0) return MIN_BAR_PX;
-    return Math.max((value / maxValue) * MAX_BAR_PX, MIN_VALUE_BAR_PX);
+    if (value <= 0) return MIN_HEIGHT_PCT;
+    return Math.max((value / maxValue) * MAX_HEIGHT_PCT, MIN_VALUE_HEIGHT_PCT);
   };
 
   return (
@@ -85,7 +87,7 @@ export function SessionTrendChart({ data }: SessionTrendChartProps) {
         </div>
       </div>
 
-      <div className="flex h-full items-end gap-1.5 pb-6 sm:gap-3">
+      <div className="flex min-h-0 flex-1 items-end gap-1.5 pb-6 sm:gap-3">
         {points.map((item, index) => {
           const heightPx = barHeight(item.value);
           const isHovered = hoveredIndex === index;
@@ -141,11 +143,15 @@ export function SessionTrendChart({ data }: SessionTrendChartProps) {
               </span>
               <div
                 className={cn(
-                  "absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs font-medium text-background transition-all duration-200",
-                  isHovered
-                    ? "translate-y-0 opacity-100"
-                    : "translate-y-1 opacity-0 pointer-events-none",
+                  "absolute left-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs font-medium text-background transition-all duration-200",
+                  isHovered && item.value > 0
+                    ? "opacity-100"
+                    : "opacity-0 pointer-events-none",
                 )}
+                style={{
+                  bottom: `calc(${Math.min(heightPx, 92)}% + 10px)`,
+                  transform: `translateX(-50%) translateY(${isHovered && item.value > 0 ? "0" : "4px"})`,
+                }}
               >
                 {item.value}
               </div>

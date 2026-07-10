@@ -14,6 +14,7 @@ export function useAutoMarquee<T extends HTMLElement>(
 
     let frame: number;
     let paused = false;
+    let userActive = false;
     let resumeTimer: ReturnType<typeof setTimeout>;
 
     const wrap = () => {
@@ -33,38 +34,57 @@ export function useAutoMarquee<T extends HTMLElement>(
     frame = requestAnimationFrame(step);
 
     const pause = () => {
+      userActive = true;
       paused = true;
       clearTimeout(resumeTimer);
     };
+
+    // Pushes the resume further out on every sign of movement, so it
+    // only fires once things have actually settled. This is what
+    // handles momentum/inertial scrolling that continues on mobile
+    // after touchend has already fired.
     const scheduleResume = () => {
       clearTimeout(resumeTimer);
       resumeTimer = setTimeout(() => {
+        userActive = false;
         paused = false;
       }, 2500);
     };
-    const onScroll = () => wrap();
 
-    el.addEventListener("pointerdown", pause);
-    el.addEventListener("pointerup", scheduleResume);
-    el.addEventListener("pointercancel", scheduleResume);
-    el.addEventListener("touchstart", pause, { passive: true });
-    el.addEventListener("touchend", scheduleResume);
-    el.addEventListener("touchcancel", scheduleResume);
-    el.addEventListener("wheel", () => {
+    const onInteractionEnd = () => {
+      scheduleResume();
+    };
+
+    const onScroll = () => {
+      wrap();
+      // still moving (manual drag or momentum) -> keep delaying resume
+      if (userActive) scheduleResume();
+    };
+
+    const onWheel = () => {
       pause();
       scheduleResume();
-    }, { passive: true });
+    };
+
+    el.addEventListener("pointerdown", pause);
+    el.addEventListener("pointerup", onInteractionEnd);
+    el.addEventListener("pointercancel", onInteractionEnd);
+    el.addEventListener("touchstart", pause, { passive: true });
+    el.addEventListener("touchend", onInteractionEnd);
+    el.addEventListener("touchcancel", onInteractionEnd);
+    el.addEventListener("wheel", onWheel, { passive: true });
     el.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
       cancelAnimationFrame(frame);
       clearTimeout(resumeTimer);
       el.removeEventListener("pointerdown", pause);
-      el.removeEventListener("pointerup", scheduleResume);
-      el.removeEventListener("pointercancel", scheduleResume);
+      el.removeEventListener("pointerup", onInteractionEnd);
+      el.removeEventListener("pointercancel", onInteractionEnd);
       el.removeEventListener("touchstart", pause);
-      el.removeEventListener("touchend", scheduleResume);
-      el.removeEventListener("touchcancel", scheduleResume);
+      el.removeEventListener("touchend", onInteractionEnd);
+      el.removeEventListener("touchcancel", onInteractionEnd);
+      el.removeEventListener("wheel", onWheel);
       el.removeEventListener("scroll", onScroll);
     };
   }, [enabled, speed]);
