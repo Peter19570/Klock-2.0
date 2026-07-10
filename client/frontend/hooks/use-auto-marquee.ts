@@ -4,13 +4,16 @@ import { useEffect, useRef } from "react";
 
 export function useAutoMarquee<T extends HTMLElement>(
   enabled: boolean,
-  speed = 0.4,
+  speed = 1,
 ) {
   const ref = useRef<T>(null);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el || !enabled) return;
+const el = ref.current;
+console.log("marquee effect fired", { el, enabled });
+if (!el || !enabled) return;
+
+el.style.scrollBehavior = "auto";
 
     let frame: number;
     let paused = false;
@@ -32,6 +35,7 @@ export function useAutoMarquee<T extends HTMLElement>(
       frame = requestAnimationFrame(step);
     };
     frame = requestAnimationFrame(step);
+    console.log("marquee loop started", el.scrollWidth, el.clientWidth);
 
     const pause = () => {
       userActive = true;
