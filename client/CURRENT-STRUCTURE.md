@@ -113,7 +113,10 @@ frontend/
 │   ├── live-map
 │   │   ├── components
 │   │   │   ├── branch-selector.tsx
-│   │   │   └── live-map.tsx
+│   │   │   ├── live-map.tsx
+│   │   │   └── user-info-tooltip.tsx
+│   │   ├── hooks
+│   │   │   └── use-live-users-socket.ts
 │   │   └── api.ts
 │   └── sessions
 │       └── components

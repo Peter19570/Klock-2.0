@@ -95,7 +95,14 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserDetailedResponse findById(CustomUserPrincipal principal){
+    public UserDetailedResponse findById(CustomUserPrincipal principal, UUID id){
+        User user = userRepo.findByIdAndOrganizationIdAndDeletedAtIsNull(id, principal.orgId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        return userMapper.toDetailedDto(user);
+    }
+
+    @Transactional(readOnly = true)
+    public UserDetailedResponse getCurrentUser(CustomUserPrincipal principal){
         return userMapper.toDetailedDto(fetchCurrentUser(principal));
     }
 
@@ -141,6 +148,10 @@ public class UserService {
                     .orElseThrow(() -> new NotFoundException("Branch not found"));
 
             user.setBranch(branch);
+        }
+
+        if (user.getUserRole().equals(UserRole.ADMIN) && (request.branchId() != null || request.userRole() != null)){
+            throw new IllegalStateException("Admins cannot change user role or branch");
         }
 
         userMapper.updateEntityFromRequest(request, user);

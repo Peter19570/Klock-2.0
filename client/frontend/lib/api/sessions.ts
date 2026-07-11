@@ -10,6 +10,7 @@ export interface SessionFilters {
   minWorkDate?: string;
   maxWorkDate?: string;
   sessionUser?: string;
+  userId?: string;
 }
 
 export async function fetchSessions(filters: SessionFilters = {}) {

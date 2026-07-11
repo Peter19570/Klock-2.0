@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/auth-store";
 import { fetchSessions, type SessionFilters } from "@/lib/api/sessions";
+import { fetchUserById } from "@/features/users/api";
 import { SessionTable } from "@/features/sessions/components/session-table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +13,7 @@ import type { components } from "@/lib/api/generated/schema";
 import { DatePicker } from "@/components/common/date-picker";
 import { EnumSelect } from "@/components/common/enum-select";
 import { cn } from "@/lib/utils";
-import { SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal, ArrowLeft } from "lucide-react";
 
 type PageResponseSessionResponse =
   components["schemas"]["PageResponseSessionResponse"];
@@ -23,7 +25,15 @@ export default function SessionsPage() {
   const role = useAuthStore((s) => s.user?.userRole);
   const isStaffView = role === "ADMIN" || role === "SUPER_ADMIN";
 
-  const [filters, setFilters] = useState<SessionFilters>({ page: 0 });
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const userIdParam = searchParams.get("userId") ?? undefined;
+
+  const [filters, setFilters] = useState<SessionFilters>({
+    page: 0,
+    userId: userIdParam,
+  });
+  const [scopedUserName, setScopedUserName] = useState<string | null>(null);
   const [pageData, setPageData] = useState<PageResponseSessionResponse | null>(
     null,
   );
@@ -40,6 +50,18 @@ export default function SessionsPage() {
     });
   }, [filters]);
 
+  useEffect(() => {
+    if (!userIdParam) return;
+    fetchUserById(userIdParam).then((u) => {
+      if (u) setScopedUserName(`${u.firstName} ${u.lastName}`);
+    });
+  }, [userIdParam]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFilters((f) => ({ ...f, userId: userIdParam, page: 0 }));
+  }, [userIdParam]);
+
   function updateFilter<K extends keyof SessionFilters>(
     key: K,
     value: SessionFilters[K],
@@ -48,7 +70,7 @@ export default function SessionsPage() {
   }
 
   function clearFilters() {
-    setFilters({ page: 0 });
+    setFilters({ page: 0, userId: userIdParam });
   }
 
   const sessions = pageData?.content ?? [];
@@ -67,10 +89,26 @@ export default function SessionsPage() {
     <div className="pb-16 pt-8">
       <h1 className="text-2xl font-semibold tracking-tight">Sessions</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        {isStaffView
-          ? "All sessions across your organization."
-          : "Your clock-in history."}
+        {userIdParam
+          ? "Filtered to one employee's clock-in history."
+          : isStaffView
+            ? "All sessions across your organization."
+            : "Your clock-in history."}
       </p>
+
+      {userIdParam && (
+        <button
+          type="button"
+          onClick={() => router.push("/users")}
+          className="mt-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Back to users
+          {scopedUserName && (
+            <span className="text-foreground"> · {scopedUserName}</span>
+          )}
+        </button>
+      )}
 
       <button
         type="button"
@@ -99,7 +137,7 @@ export default function SessionsPage() {
       <div
         className={cn(
           "mt-4 grid-cols-1 gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm sm:grid-cols-2 md:mt-6 md:grid md:grid-cols-3",
-          isStaffView ? "lg:grid-cols-6" : "lg:grid-cols-5",
+          isStaffView && !userIdParam ? "lg:grid-cols-6" : "lg:grid-cols-5",
           mobileFiltersOpen ? "grid" : "hidden md:grid",
         )}
       >
@@ -137,7 +175,7 @@ export default function SessionsPage() {
           />
         </div>
 
-        {isStaffView && (
+        {isStaffView && !userIdParam && (
           <div className="space-y-1.5">
             <Label htmlFor="sessionUser">Employee</Label>
             <Input
@@ -171,7 +209,10 @@ export default function SessionsPage() {
             Loading sessions...
           </div>
         ) : (
-          <SessionTable sessions={sessions} showUserColumn={isStaffView} />
+          <SessionTable
+            sessions={sessions}
+            showUserColumn={isStaffView && !userIdParam}
+          />
         )}
       </div>
 

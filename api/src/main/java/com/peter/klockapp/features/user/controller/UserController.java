@@ -78,11 +78,11 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<ApiResponse<UserDetailedResponse>> getById(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @PathVariable UUID id){
-        UserDetailedResponse response = userService.findById(principal);
+        UserDetailedResponse response = userService.findById(principal, id);
         return ResponseEntity.ok(ApiResponse.success("Selected user information", response));
     }
 
@@ -106,7 +106,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/device-id")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<Void> resetDeviceId(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @PathVariable UUID id){
@@ -117,7 +117,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserDetailedResponse>> getCurrentUser(
             @AuthenticationPrincipal CustomUserPrincipal principal){
-        UserDetailedResponse response = userService.findById(principal);
+        UserDetailedResponse response = userService.getCurrentUser(principal);
         return ResponseEntity.ok(ApiResponse.success("Current user information", response));
     }
 
