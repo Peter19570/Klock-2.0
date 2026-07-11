@@ -591,6 +591,8 @@ export interface components {
             latitude?: number;
             /** Format: double */
             longitude?: number;
+            /** Format: double */
+            radius?: number;
             /** @enum {string} */
             branchStatus?: "LOCKED" | "UNLOCKED";
             /** Format: int32 */

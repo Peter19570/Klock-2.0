@@ -10,6 +10,7 @@ public record BranchResponse(
         String slug,
         double latitude,
         double longitude,
+        Double radius,
         BranchStatus branchStatus,
         int currentActiveCount
 ) {
