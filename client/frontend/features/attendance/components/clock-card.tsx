@@ -53,7 +53,7 @@ export function ClockCard() {
       : 0;
 
   return (
-    <div className="relative flex h-[220px] w-full max-w-[360px] flex-col overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm sm:h-[280px] sm:max-w-[560px] sm:p-6">
+    <div className="relative flex h-55 w-full max-w-90 flex-col overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm sm:h-70 sm:max-w-140 sm:p-6">
       {/* top row: state pill (left) + branch you're CLOCKED IN AT (right, desktop) / countdown badge (right, mobile) */}
       <div className="flex items-start justify-between gap-3">
         <StatusPill state={pillState} />
@@ -90,20 +90,20 @@ export function ClockCard() {
           isClockedIn={clockedIn}
           onToggle={clockedIn ? session.clockOut : session.clockIn}
           disabled={session.isBusy || session.isClockedIn === null}
-          className="max-w-[220px]"
+          className="max-w-55"
         />
 
         {/* assigned branch — always visible, regardless of clock state */}
         {assignedBranch && (
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Building2 className="h-3.5 w-3.5 shrink-0" />
-            <span className="max-w-[220px] truncate">{assignedBranch}</span>
+            <span className="max-w-55 truncate">{assignedBranch}</span>
           </p>
         )}
 
         {/* mobile only — the active-branch marquee above is hidden below sm */}
         {clockedIn && activeBranchName && (
-          <div className="flex max-w-[260px] flex-col items-center text-center sm:hidden">
+          <div className="flex max-w-65 flex-col items-center text-center sm:hidden">
             <MarqueeText
               text={activeBranchName}
               className="max-w-full text-sm font-medium text-foreground"
@@ -122,7 +122,7 @@ export function ClockCard() {
         {/* desktop bar — animated grid-rows wrapper so it pushes content up instead of popping in */}
         <div
           className={cn(
-            "hidden w-full max-w-[280px] grid-cols-1 transition-[grid-template-rows] duration-300 ease-out sm:grid",
+            "hidden w-full max-w-70 grid-cols-1 transition-[grid-template-rows] duration-300 ease-out sm:grid",
             showCountdownBar ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
           )}
         >
@@ -131,12 +131,9 @@ export function ClockCard() {
               <div className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-amber-500">
                 <MapPinOff className="h-3.5 w-3.5 shrink-0" />
                 <span>
-                  You&apos;re away from the branch perimeter — clocking out
-                  in{" "}
+                  You&apos;re away from the branch perimeter — clocking out in{" "}
                   {session.geofence.secondsUntilAutoClockOut != null
-                    ? formatCountdown(
-                        session.geofence.secondsUntilAutoClockOut,
-                      )
+                    ? formatCountdown(session.geofence.secondsUntilAutoClockOut)
                     : "0:00"}
                 </span>
               </div>

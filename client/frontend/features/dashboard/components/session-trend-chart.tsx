@@ -56,7 +56,7 @@ export function SessionTrendChart({ data }: SessionTrendChartProps) {
     <div
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={handleLeave}
-      className="group relative flex h-64 w-full flex-col gap-6 rounded-2xl border border-border bg-card p-4 shadow-sm transition-colors hover:border-foreground/10 sm:h-80 sm:p-6 lg:h-116.25 lg:max-w-250 lg:flex-[7]"
+      className="group relative flex h-64 w-full flex-col gap-6 rounded-2xl border border-border bg-card p-4 shadow-sm transition-colors hover:border-foreground/10 sm:h-80 sm:p-6 lg:h-116.25 lg:max-w-250 lg:flex-7"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

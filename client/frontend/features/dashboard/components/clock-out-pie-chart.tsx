@@ -35,7 +35,7 @@ export function ClockOutPieChart({ stats }: ClockOutPieChartProps) {
   const hasData = total > 0;
 
   return (
-    <div className="flex h-64 w-full flex-col gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm transition-colors hover:border-foreground/10 sm:h-80 sm:p-6 lg:h-116.25 lg:min-w-90 lg:flex-[3]">
+    <div className="flex h-64 w-full flex-col gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm transition-colors hover:border-foreground/10 sm:h-80 sm:p-6 lg:h-116.25 lg:min-w-90 lg:flex-3">
       <div className="shrink-0">
         <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Clock-out breakdown
@@ -70,7 +70,7 @@ export function ClockOutPieChart({ stats }: ClockOutPieChartProps) {
                     <Cell key={entry.key} fill={`var(--color-${entry.key})`} />
                   ))}
                 </Pie>
-                <ChartLegend content={<ChartLegendContent nameKey="key" />} />
+                <ChartLegend content={<ChartLegendContent nameKey="key" payload={undefined} />} />
               </PieChart>
             </ChartContainer>
           </div>

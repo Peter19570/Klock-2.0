@@ -14,7 +14,7 @@ export default function AttendancePage() {
       <GreetingHero />
       <section className="grid grid-cols-1 items-stretch justify-items-center gap-6 md:grid-cols-[1.3fr_1fr] md:items-center md:gap-4">
         <ClockCard />
-        <div className="w-full max-w-[360px]">
+        <div className="w-full max-w-90">
           <LocationMap
             location={
               geo.status === "ready"
