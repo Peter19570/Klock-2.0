@@ -1,8 +1,13 @@
+"use client";
+
+import dynamic from "next/dynamic";
+
+const LiveMap = dynamic(
+  () =>
+    import("@/features/live-map/components/live-map").then((m) => m.LiveMap),
+  { ssr: false },
+);
+
 export default function LiveMapPage() {
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold">Live Map</h1>
-      <p className="mt-2 text-muted-foreground">Live map view — coming soon.</p>
-    </div>
-  );
+  return <LiveMap />;
 }
