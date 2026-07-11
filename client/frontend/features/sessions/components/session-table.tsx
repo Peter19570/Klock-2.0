@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { Ban, ChevronDown, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ClockEventsSubTable } from "./clock-events-subtable";
 import type { components } from "@/lib/api/generated/schema";
@@ -12,6 +12,9 @@ type SessionResponse = components["schemas"]["SessionResponse"];
 interface SessionTableProps {
   sessions: SessionResponse[];
   showUserColumn?: boolean;
+  showActions?: boolean;
+  onDelete?: (session: SessionResponse) => void;
+  onTerminate?: (session: SessionResponse) => void;
   className?: string;
 }
 
@@ -42,14 +45,20 @@ function formatDistance(meters?: number) {
     : `${meters.toFixed(0)} m`;
 }
 
-const gridCols = (showUserColumn: boolean) =>
-  showUserColumn
-    ? "1.2fr 1.4fr 1fr 1fr 1fr 100px"
-    : "1.2fr 1fr 1fr 1fr 100px";
+const gridCols = (showUserColumn: boolean, showActions: boolean) => {
+  const cols = ["1.2fr"];
+  if (showUserColumn) cols.push("1.4fr");
+  cols.push("1fr", "1fr", "1fr", "100px");
+  if (showActions) cols.push("120px");
+  return cols.join(" ");
+};
 
 export function SessionTable({
   sessions,
   showUserColumn = false,
+  showActions = false,
+  onDelete,
+  onTerminate,
   className,
 }: SessionTableProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -75,10 +84,12 @@ export function SessionTable({
       )}
     >
       <div className="overflow-x-auto">
-        <div className="min-w-[720px]">
+        <div className="min-w-190">
           <div
             className="grid items-center gap-3 border-b border-border/60 bg-muted/40 px-5 py-3 text-xs font-medium uppercase tracking-wide text-muted-foreground"
-            style={{ gridTemplateColumns: gridCols(showUserColumn) }}
+            style={{
+              gridTemplateColumns: gridCols(showUserColumn, showActions),
+            }}
           >
             <div>Date</div>
             {showUserColumn && <div>Employee</div>}
@@ -86,6 +97,7 @@ export function SessionTable({
             <div>Status</div>
             <div>Distance</div>
             <div className="pr-2 text-right">Events</div>
+            {showActions && <div className="text-right">Actions</div>}
           </div>
 
           <motion.div
@@ -108,7 +120,12 @@ export function SessionTable({
                 >
                   <div
                     className="grid items-center gap-3 px-5 py-3.5 text-sm transition-colors hover:bg-muted/30"
-                    style={{ gridTemplateColumns: gridCols(showUserColumn) }}
+                    style={{
+                      gridTemplateColumns: gridCols(
+                        showUserColumn,
+                        showActions,
+                      ),
+                    }}
                   >
                     <div className="font-medium text-foreground">
                       {formatDate(session.workDate)}
@@ -152,7 +169,9 @@ export function SessionTable({
                       <button
                         type="button"
                         onClick={() =>
-                          setExpandedId(isExpanded ? null : session.id ?? null)
+                          setExpandedId(
+                            isExpanded ? null : (session.id ?? null),
+                          )
                         }
                         className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
                       >
@@ -165,6 +184,31 @@ export function SessionTable({
                         {isExpanded ? "Hide" : "View"}
                       </button>
                     </div>
+                    {showActions && (
+                      <div
+                        className="flex items-center justify-end gap-1.5"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {session.status === "ACTIVE" && (
+                          <button
+                            type="button"
+                            title="Terminate session"
+                            onClick={() => onTerminate?.(session)}
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-border text-foreground transition-colors hover:bg-accent"
+                          >
+                            <Ban className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          title="Delete session"
+                          onClick={() => onDelete?.(session)}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-border text-destructive transition-colors hover:bg-destructive/10"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <AnimatePresence initial={false}>

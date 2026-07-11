@@ -52,6 +52,7 @@ frontend/
 │   ├── brand
 │   │   └── klock-logo.tsx
 │   ├── common
+│   │   ├── confirm-dialog.tsx
 │   │   ├── date-picker.tsx
 │   │   ├── enum-select.tsx
 │   │   └── toast.tsx
@@ -118,11 +119,18 @@ frontend/
 │   │   ├── hooks
 │   │   │   └── use-live-users-socket.ts
 │   │   └── api.ts
-│   └── sessions
-│       └── components
-│           ├── clock-events-subtable.tsx
-│           ├── recent-sessions.tsx
-│           └── session-table.tsx
+│   ├── sessions
+│   │   └── components
+│   │       ├── clock-events-subtable.tsx
+│   │       ├── recent-sessions.tsx
+│   │       └── session-table.tsx
+│   └── users
+│       ├── components
+│       │   ├── branch-select.tsx
+│       │   ├── user-detail-modal.tsx
+│       │   ├── user-form-dialog.tsx
+│       │   └── user-table.tsx
+│       └── api.ts
 ├── hooks
 │   ├── use-auto-marquee.ts
 │   ├── use-count-up.ts

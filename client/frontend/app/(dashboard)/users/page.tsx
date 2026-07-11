@@ -152,7 +152,7 @@ export default function UsersPage() {
             setEditingUser(null);
             setFormOpen(true);
           }}
-          className="gap-1.5"
+          className="mt-1.5 gap-1.5"
         >
           <UserPlus className="h-4 w-4" />
           New user
