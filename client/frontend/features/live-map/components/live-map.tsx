@@ -12,6 +12,7 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useAuthStore } from "@/store/auth-store";
+import { useTheme } from "@/lib/theme/theme-provider";
 import { getMyBranch, getAllBranches } from "@/features/live-map/api";
 import { BranchSelector } from "./branch-selector";
 import type { components } from "@/lib/api/generated/schema";
@@ -20,6 +21,11 @@ type BranchResponse = components["schemas"]["BranchResponse"];
 type BranchDetailedResponse = components["schemas"]["BranchDetailedResponse"];
 
 const DEFAULT_CENTER: [number, number] = [5.6037, -0.187]; // Accra fallback
+
+const CARTO_TILES = {
+  light: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+  dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+};
 
 function branchIcon() {
   return L.divIcon({
@@ -46,12 +52,11 @@ function FlyToBranch({ target }: { target: [number, number] | null }) {
 export function LiveMap() {
   const user = useAuthStore((s) => s.user);
   const isSuperAdmin = user?.userRole === "SUPER_ADMIN";
+  const { resolvedTheme } = useTheme();
 
   const [branches, setBranches] = useState<BranchResponse[]>([]);
-  const [myBranch, setMyBranch] = useState<BranchDetailedResponse | null>(
-    null,
-  );
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [myBranch, setMyBranch] = useState<BranchDetailedResponse | null>(null);
+  const [selectedId, setSelectedId] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -98,9 +103,12 @@ export function LiveMap() {
   }
 
   return (
-    <div className="relative h-[calc(100vh-4rem)] w-full">
+    // `isolate` forces this wrapper to own its own stacking context, so
+    // Leaflet's internal panes (which use z-index up to 700 for popups)
+    // can never escape and paint over the sidebar / dropdowns / navbar.
+    <div className="relative isolate h-[calc(100vh-4rem)] w-full">
       {isSuperAdmin && (
-        <div className="absolute left-4 top-4 z-1000 w-64">
+        <div className="absolute left-20 top-4 z-1000 w-64">
           <BranchSelector
             branches={branches}
             selectedId={selectedId}
@@ -113,10 +121,10 @@ export function LiveMap() {
         center={center}
         zoom={15}
         scrollWheelZoom
-        className="h-full w-full"
+        className="h-full w-full overflow-hidden rounded-2xl"
       >
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          url={resolvedTheme === "dark" ? CARTO_TILES.dark : CARTO_TILES.light}
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
 
@@ -129,9 +137,7 @@ export function LiveMap() {
                     icon={branchIcon()}
                   >
                     <Popup>
-                      <div className="text-sm font-medium">
-                        {b.displayName}
-                      </div>
+                      <div className="text-sm font-medium">{b.displayName}</div>
                       <div className="text-xs text-muted-foreground">
                         {b.currentActiveCount ?? 0} active now
                       </div>

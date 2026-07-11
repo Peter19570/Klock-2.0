@@ -9,7 +9,7 @@ type PageResponseBranchResponse =
   components["schemas"]["PageResponseBranchResponse"];
 
 export async function getMyBranch(): Promise<BranchDetailedResponse | null> {
-  const res = await backendFetch("/api/v1/branches/0");
+  const res = await backendFetch("/api/v1/branches/00000000-0000-0000-0000-000000000000");
   if (!res.ok) return null;
   const json: { data?: BranchDetailedResponse } = await res.json();
   return json.data ?? null;

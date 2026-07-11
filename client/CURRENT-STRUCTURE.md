@@ -110,6 +110,11 @@ frontend/
 │   │   │   └── stat-card.tsx
 │   │   └── hooks
 │   │       └── use-dashboard-data.ts
+│   ├── live-map
+│   │   ├── components
+│   │   │   ├── branch-selector.tsx
+│   │   │   └── live-map.tsx
+│   │   └── api.ts
 │   └── sessions
 │       └── components
 │           ├── clock-events-subtable.tsx

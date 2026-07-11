@@ -1,5 +1,6 @@
 "use client";
 
+import { Lock } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -17,6 +18,17 @@ interface BranchSelectorProps {
   onSelect: (id: string) => void;
 }
 
+function BranchLabel({ branch }: { branch: BranchResponse }) {
+  return (
+    <span className="flex items-center gap-1.5">
+      {branch.displayName}
+      {branch.branchStatus === "LOCKED" && (
+        <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+      )}
+    </span>
+  );
+}
+
 export function BranchSelector({
   branches,
   selectedId,
@@ -28,13 +40,19 @@ export function BranchSelector({
       onValueChange={(value) => onSelect(value ?? "")}
     >
       <SelectTrigger className="w-full bg-card shadow-sm">
-        <SelectValue placeholder="Jump to branch" />
+        {/* Base UI's Select.Value takes a render function: (value) => ReactNode.
+            Without it, it just stringifies the raw value — the branch id. */}
+        <SelectValue placeholder="Jump to branch">
+          {(value: string | null) => {
+            const branch = branches.find((b) => b.id === value);
+            return branch ? <BranchLabel branch={branch} /> : "Jump to branch";
+          }}
+        </SelectValue>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent alignItemWithTrigger={false}>
         {branches.map((b) => (
           <SelectItem key={b.id} value={b.id ?? ""}>
-            {b.displayName}
-            {b.branchStatus === "LOCKED" ? " 🔒" : ""}
+            <BranchLabel branch={b} />
           </SelectItem>
         ))}
       </SelectContent>
