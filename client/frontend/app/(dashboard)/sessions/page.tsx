@@ -160,7 +160,7 @@ export default function SessionsPage() {
             type="button"
             onClick={clearFilters}
             disabled={!hasActiveFilters}
-            className="h-10 w-full rounded-[var(--radius)] border border-border text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+            className="h-10 w-full rounded-(--radius) border border-border text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
           >
             Clear all
           </button>
