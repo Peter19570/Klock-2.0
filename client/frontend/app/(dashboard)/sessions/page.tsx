@@ -65,9 +65,7 @@ export default function SessionsPage() {
 
   return (
     <div className="pb-16 pt-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-        Sessions
-      </h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Sessions</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         {isStaffView
           ? "All sessions across your organization."

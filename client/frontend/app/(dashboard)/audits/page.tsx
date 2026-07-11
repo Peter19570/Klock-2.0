@@ -1,8 +1,8 @@
 export default function AuditsPage() {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold">Audit Logs</h1>
-      <p className="mt-2 text-muted-foreground">
+    <div className="py-6">
+      <h1 className="text-2xl font-semibold tracking-tight">Audit Logs</h1>
+      <p className="mt-1 text-sm text-muted-foreground">
         Audit log viewer — coming soon (Super Admin only).
       </p>
     </div>
