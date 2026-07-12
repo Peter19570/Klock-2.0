@@ -60,6 +60,19 @@ export function TimePicker({
     onChange(toValue(next.h12, next.m, next.period));
   }
 
+  function setToNow() {
+    const now = new Date();
+    let hours = now.getHours();
+    let minutes = Math.round(now.getMinutes() / 5) * 5;
+    if (minutes === 60) {
+      minutes = 0;
+      hours = (hours + 1) % 24;
+    }
+    onChange(
+      `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`,
+    );
+  }
+
   const display = formatDisplay(value);
 
   return (
@@ -97,7 +110,7 @@ export function TimePicker({
         </div>
 
         <div className="grid grid-cols-2 divide-x divide-border/60">
-          <div className="max-h-48 overflow-y-auto p-1">
+          <div className="max-h-48 overflow-y-auto scrollbar-hide p-1">
             {HOURS.map((h) => (
               <button
                 key={h}
@@ -113,7 +126,7 @@ export function TimePicker({
               </button>
             ))}
           </div>
-          <div className="max-h-48 overflow-y-auto p-1">
+          <div className="max-h-48 overflow-y-auto scrollbar-hide p-1">
             {MINUTES.map((m) => (
               <button
                 key={m}
@@ -134,14 +147,7 @@ export function TimePicker({
         <div className="flex items-center justify-between gap-2 border-t border-border/60 px-3 py-2">
           <button
             type="button"
-            onClick={() => {
-              const now = new Date();
-              onChange(
-                `${String(now.getHours()).padStart(2, "0")}:${String(
-                  now.getMinutes(),
-                ).padStart(2, "0")}:00`,
-              );
-            }}
+            onClick={setToNow}
             className="rounded-md px-2 py-1 text-xs font-medium text-primary transition-colors hover:bg-accent"
           >
             Now

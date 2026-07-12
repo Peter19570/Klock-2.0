@@ -215,7 +215,7 @@ export function BranchFormDialog({
 
         <form
           onSubmit={handleSubmit}
-          className="max-h-[70vh] space-y-5 overflow-y-auto pr-1"
+          className="max-h-[70vh] space-y-5 overflow-y-auto scrollbar-hide px-1"
         >
           <div className="space-y-1.5">
             <Label htmlFor="displayName">Branch name</Label>

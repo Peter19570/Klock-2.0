@@ -55,6 +55,7 @@ frontend/
 │   │   ├── confirm-dialog.tsx
 │   │   ├── date-picker.tsx
 │   │   ├── enum-select.tsx
+│   │   ├── time-picker.tsx
 │   │   └── toast.tsx
 │   ├── layout
 │   │   ├── navbar.tsx
@@ -102,6 +103,12 @@ frontend/
 │   │   │   ├── register-form.tsx
 │   │   │   ├── reset-password-form.tsx
 │   │   │   └── verify-email-status.tsx
+│   │   └── api.ts
+│   ├── branches
+│   │   ├── components
+│   │   │   ├── branch-detail-modal.tsx
+│   │   │   ├── branch-form-dialog.tsx
+│   │   │   └── branch-table.tsx
 │   │   └── api.ts
 │   ├── dashboard
 │   │   ├── components

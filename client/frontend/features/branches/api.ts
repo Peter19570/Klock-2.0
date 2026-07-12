@@ -14,6 +14,10 @@ export interface BranchFilters {
   branchStatus?: "LOCKED" | "UNLOCKED";
 }
 
+// Backend resolves this sentinel UUID to the caller's own branch —
+// used by admins, who can't hit the list/all-branches endpoint.
+export const OWN_BRANCH_ID = "00000000-0000-0000-0000-000000000000";
+
 function buildQuery<T extends object>(params: T) {
   const q = new URLSearchParams();
   Object.entries(params as Record<string, string | number | undefined>).forEach(
@@ -41,6 +45,12 @@ export async function fetchBranchById(
   if (!res.ok) return undefined;
   const payload = await res.json();
   return payload.data;
+}
+
+export async function fetchOwnBranch(): Promise<
+  BranchDetailedResponse | undefined
+> {
+  return fetchBranchById(OWN_BRANCH_ID);
 }
 
 export async function createBranch(

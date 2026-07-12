@@ -28,7 +28,7 @@ function formatRadius(meters?: number) {
     : `${meters.toFixed(0)} m`;
 }
 
-const gridCols = "1.6fr 1fr 1fr 1fr 100px";
+const gridCols = "1.6fr 1fr 1fr 100px";
 
 export function BranchTable({
   branches,
@@ -57,7 +57,7 @@ export function BranchTable({
         className,
       )}
     >
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto scrollbar-hide">
         <div className="min-w-160">
           <div
             className="grid items-center gap-3 border-b border-border/60 bg-muted/40 px-5 py-3 text-xs font-medium uppercase tracking-wide text-muted-foreground"
@@ -66,7 +66,6 @@ export function BranchTable({
             <div>Branch</div>
             <div>Status</div>
             <div>Radius</div>
-            <div>Active now</div>
             <div className="text-right">Actions</div>
           </div>
 
@@ -106,9 +105,6 @@ export function BranchTable({
                 </div>
                 <div className="text-muted-foreground">
                   {formatRadius(branch.radius)}
-                </div>
-                <div className="text-muted-foreground">
-                  {branch.currentActiveCount ?? 0}
                 </div>
                 <div
                   className="flex items-center justify-end gap-1.5"

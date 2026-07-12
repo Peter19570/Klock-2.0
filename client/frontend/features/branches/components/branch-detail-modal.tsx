@@ -33,6 +33,11 @@ const STATUS_STYLES: Record<string, string> = {
   LOCKED: "bg-destructive/10 border-destructive/30 text-destructive",
 };
 
+const DRIFT_STATUS_STYLES: Record<string, string> = {
+  STABLE: "bg-emerald-500/10 border-emerald-500/30 text-emerald-500",
+  DRIFTING: "bg-amber-500/10 border-amber-500/30 text-amber-500",
+};
+
 function formatTime(value?: string) {
   if (!value) return "—";
   const [hStr, mStr] = value.split(":");
@@ -130,7 +135,7 @@ export function BranchDetailModal({
                   Avg. clock-in distance
                 </div>
                 <div className="mt-1 text-xl font-semibold text-foreground">
-                  {formatDistance(branch.displayAvg)}
+                  {formatDistance(branch.avgClockInDistanceFromBranch)}
                 </div>
               </div>
             </div>
@@ -144,9 +149,33 @@ export function BranchDetailModal({
                 </span>
               </div>
               <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Clock-in status</span>
+                {branch.status ? (
+                  <span
+                    className={cn(
+                      "rounded-lg border px-2 py-0.5 text-xs font-medium",
+                      DRIFT_STATUS_STYLES[branch.status] ??
+                        "border-border bg-muted text-muted-foreground",
+                    )}
+                  >
+                    {branch.status}
+                  </span>
+                ) : (
+                  <span className="font-medium text-foreground">—</span>
+                )}
+              </div>
+              <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Geofence</span>
                 <span className="font-medium text-foreground">
                   {branch.geofenceName ?? "—"} · {formatDistance(branch.radius)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Auto clock-out</span>
+                <span className="font-medium text-foreground">
+                  {branch.geofenceExitTimeoutMinutes !== undefined
+                    ? `${branch.geofenceExitTimeoutMinutes} min after leaving zone`
+                    : "—"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
