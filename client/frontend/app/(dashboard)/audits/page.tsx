@@ -16,7 +16,8 @@ import {
   type AuditResponse,
 } from "@/features/audits/api";
 import { cn } from "@/lib/utils";
-import { SlidersHorizontal } from "lucide-react";
+import { ArrowLeft, SlidersHorizontal } from "lucide-react";
+import { fetchUserById } from "@/features/users/api";
 
 export default function AuditsPage() {
   const router = useRouter();
@@ -35,6 +36,15 @@ export default function AuditsPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const userIdParam = searchParams.get("userId") ?? undefined;
+  const [scopedUserName, setScopedUserName] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!userIdParam) return;
+    fetchUserById(userIdParam).then((u) => {
+      if (u) setScopedUserName(`${u.firstName} ${u.lastName}`);
+    });
+  }, [userIdParam]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -45,13 +55,14 @@ export default function AuditsPage() {
       auditAction,
       minCreatedAt,
       maxCreatedAt,
+      userId: userIdParam,
     }).then((data) => {
       setAudits(data?.content ?? []);
       setTotalPages(data?.totalPages ?? 0);
       setTotalElements(data?.totalElements ?? 0);
       setLoading(false);
     });
-  }, [page, fullName, auditAction, minCreatedAt, maxCreatedAt]);
+  }, [page, fullName, auditAction, minCreatedAt, maxCreatedAt, userIdParam]);
 
   function updateParams(
     updates: Record<string, string | undefined>,
@@ -90,6 +101,20 @@ export default function AuditsPage() {
           Every recorded action across your organization.
         </p>
       </div>
+
+      {userIdParam && (
+        <button
+          type="button"
+          onClick={() => router.push("/users")}
+          className="mt-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Back to users
+          {scopedUserName && (
+            <span className="text-foreground"> · {scopedUserName}</span>
+          )}
+        </button>
+      )}
 
       <button
         type="button"

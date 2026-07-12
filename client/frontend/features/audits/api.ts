@@ -43,6 +43,7 @@ export interface AuditFilters {
   auditAction?: AuditAction;
   minCreatedAt?: string;
   maxCreatedAt?: string;
+  userId?: string;
 }
 
 function buildQuery<T extends object>(params: T) {

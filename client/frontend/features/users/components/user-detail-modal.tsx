@@ -34,7 +34,10 @@ function Row({ label, value }: { label: string; value?: React.ReactNode }) {
   );
 }
 
-export function UserDetailModal({ userId, onOpenChange }: UserDetailModalProps) {
+export function UserDetailModal({
+  userId,
+  onOpenChange,
+}: UserDetailModalProps) {
   const router = useRouter();
   const [user, setUser] = useState<UserDetailedResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -110,12 +113,20 @@ export function UserDetailModal({ userId, onOpenChange }: UserDetailModalProps) 
               />
             </div>
 
-            <Button
-              className="w-full"
-              onClick={() => router.push(`/sessions?userId=${user.id}`)}
-            >
-              View sessions
-            </Button>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant="outline"
+                onClick={() => router.push(`/sessions?userId=${user.id}`)}
+              >
+                View sessions
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => router.push(`/audits?userId=${user.id}`)}
+              >
+                View audits
+              </Button>
+            </div>
           </div>
         )}
       </DialogContent>
