@@ -69,6 +69,14 @@ public class AuthController {
                 "Identity verification successful."));
     }
 
+    @GetMapping("/resend-verification-email")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<Void>> resendVerificationEmail(
+            @AuthenticationPrincipal CustomUserPrincipal principal){
+        authService.resendVerificationEmail(principal);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/change-email")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<String>> requestChange(

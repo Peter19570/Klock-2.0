@@ -27,8 +27,11 @@ import { Pagination } from "@/components/common/pagination";
 const ROLE_OPTIONS = ["USER", "ADMIN", "SUPER_ADMIN"] as const;
 import { AnimatePresence, motion } from "framer-motion";
 import { DatePicker } from "@/components/common/date-picker";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export default function UsersPage() {
+  usePageTitle("Users");
+  
   const role = useAuthStore((s) => s.user?.userRole);
   const isSuperAdmin = role === "SUPER_ADMIN";
   const toasts = useToasts();

@@ -5,9 +5,12 @@ import { ClockCard } from "@/features/attendance/components/clock-card";
 import { LocationMap } from "@/features/attendance/components/location-map";
 import { RecentSessions } from "@/features/sessions/components/recent-sessions";
 import { useGeolocation, formatCoordinates } from "@/hooks/use-geolocation";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export default function AttendancePage() {
   const geo = useGeolocation();
+
+  usePageTitle("Attendance");
 
   return (
     <div className="pb-16">

@@ -6,8 +6,11 @@ import { DashboardStats } from "@/features/dashboard/components/dashboard-stats"
 import { SessionTrendChart } from "@/features/dashboard/components/session-trend-chart";
 import { ClockOutPieChart } from "@/features/dashboard/components/clock-out-pie-chart";
 import { SessionTable } from "@/features/sessions/components/session-table";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export default function DashboardPage() {
+  usePageTitle("Dashboard");
+  
   const user = useAuthStore((s) => s.user);
   const { role, data, loading } = useDashboardData();
 

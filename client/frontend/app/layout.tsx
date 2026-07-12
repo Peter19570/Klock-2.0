@@ -1,12 +1,24 @@
+import { Metadata } from "next";
 import { Outfit, JetBrains_Mono, Geist } from "next/font/google";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains-mono" });
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+});
+
+export const metadata: Metadata = {
+  title: {
+    default: "Klock",
+    template: "%s · Klock",
+  },
+  description: "Attendance and workforce tracking",
+};
 
 const noFlashThemeScript = `
 (function () {
@@ -24,9 +36,22 @@ const noFlashThemeScript = `
 })();
 `;
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" className={cn(outfit.variable, jetbrainsMono.variable, "font-sans", geist.variable)} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={cn(
+        outfit.variable,
+        jetbrainsMono.variable,
+        "font-sans",
+        geist.variable,
+      )}
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: noFlashThemeScript }} />
       </head>

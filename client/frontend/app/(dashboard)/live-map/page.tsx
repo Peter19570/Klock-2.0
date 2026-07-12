@@ -1,8 +1,11 @@
 "use client";
 
 import { LiveMap } from "@/features/live-map/components/live-map";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export default function LiveMapPage() {
+  usePageTitle("Live Map");
+
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col py-6">
       <div className="shrink-0">

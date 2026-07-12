@@ -24,7 +24,7 @@ public class RegisterEmail {
     private final EmailVerificationTokenRepo emailVerificationTokenRepo;
 
     @EventListener
-    public void onUserRegistration(User user){
+    public void onSendVerificationEmail(User user){
         String rawToken = UUID.randomUUID().toString();
         emailService.sendVerificationEmail(user, rawToken);
 

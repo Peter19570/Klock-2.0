@@ -27,7 +27,10 @@ import {
   initializeAvatarUpload,
   type UserDetailedResponse,
 } from "@/features/users/api";
-import { requestEmailChange } from "@/features/auth/api";
+import {
+  requestEmailChange,
+  resendVerificationEmail,
+} from "@/features/auth/api";
 
 interface ProfileModalProps {
   open: boolean;
@@ -77,6 +80,8 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
 
   const [avatarLoading, setAvatarLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSent, setResendSent] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -106,6 +111,18 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
     }
     setEmailSent(true);
     toasts.success("Confirmation link sent");
+  }
+
+  async function handleResendVerification() {
+    setResendLoading(true);
+    const { error } = await resendVerificationEmail();
+    setResendLoading(false);
+    if (error) {
+      toasts.error(error);
+      return;
+    }
+    setResendSent(true);
+    toasts.success("Verification email sent");
   }
 
   // Cloudinary's webhook updates the backend asynchronously, so poll a
@@ -272,10 +289,26 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
             </div>
 
             <div className="divide-y divide-border/40 rounded-xl border border-border p-3.5 text-sm">
-              <Row
-                label="Email verified"
-                value={user.emailVerified ? "Yes" : "No"}
-              />
+              <div className="flex items-center justify-between py-2">
+                <span className="text-muted-foreground">Email verified</span>
+                {user.emailVerified ? (
+                  <span className="font-medium text-foreground">Yes</span>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 gap-1 px-2 text-xs"
+                    disabled={resendLoading || resendSent}
+                    onClick={handleResendVerification}
+                  >
+                    {resendLoading
+                      ? "Sending..."
+                      : resendSent
+                        ? "Sent"
+                        : "Verify email"}
+                  </Button>
+                )}
+              </div>
               <Row label="Phone" value={user.phone} />
               <Row label="Branch" value={user.assignedBranch} />
               <Row label="Organization" value={user.joinedOrganization} />

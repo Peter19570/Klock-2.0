@@ -23,6 +23,7 @@ import { EnumSelect } from "@/components/common/enum-select";
 import { cn } from "@/lib/utils";
 import { SlidersHorizontal, ArrowLeft, Download } from "lucide-react";
 import { Pagination } from "@/components/common/pagination";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 type PageResponseSessionResponse =
   components["schemas"]["PageResponseSessionResponse"];
@@ -62,6 +63,8 @@ export default function SessionsPage() {
   const [terminateTarget, setTerminateTarget] =
     useState<SessionResponse | null>(null);
   const [terminateLoading, setTerminateLoading] = useState(false);
+
+  usePageTitle(isStaffView ? "Sessions" : "My Sessions");
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect

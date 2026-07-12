@@ -18,8 +18,11 @@ import {
 import { cn } from "@/lib/utils";
 import { ArrowLeft, SlidersHorizontal } from "lucide-react";
 import { fetchUserById } from "@/features/users/api";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export default function AuditsPage() {
+  usePageTitle("Audits");
+
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

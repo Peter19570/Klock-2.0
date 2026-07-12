@@ -38,3 +38,12 @@ export async function confirmEmailChange(token: string): Promise<{ error?: strin
   }
   return {};
 }
+
+export async function resendVerificationEmail(): Promise<{ error?: string }> {
+  const res = await backendFetch("/api/v1/auth/resend-verification-email");
+  if (!res.ok) {
+    const payload = await res.json().catch(() => ({}));
+    return { error: payload.msg ?? "Failed to resend verification email" };
+  }
+  return {};
+}
