@@ -199,6 +199,16 @@ export default function SessionsPage() {
           )}
         </button>
       )}
+      {!isStaffView && (
+        <button
+          type="button"
+          onClick={() => router.push("/attendance")}
+          className="mt-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Back to attendance
+        </button>
+      )}
 
       <button
         type="button"
