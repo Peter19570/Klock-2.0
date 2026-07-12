@@ -4,6 +4,8 @@
 frontend/
 ├── app
 │   ├── (auth)
+│   │   ├── confirm-email
+│   │   │   └── page.tsx
 │   │   ├── forgot-password
 │   │   │   └── page.tsx
 │   │   ├── login
@@ -108,6 +110,7 @@ frontend/
 │   │   └── constants.ts
 │   ├── auth
 │   │   ├── components
+│   │   │   ├── confirm-email-status.tsx
 │   │   │   ├── force-password-change-dialog.tsx
 │   │   │   ├── forgot-password-form.tsx
 │   │   │   ├── login-form.tsx
@@ -156,6 +159,7 @@ frontend/
 │   └── users
 │       ├── components
 │       │   ├── branch-select.tsx
+│       │   ├── profile-modal.tsx
 │       │   ├── user-detail-modal.tsx
 │       │   ├── user-form-dialog.tsx
 │       │   └── user-table.tsx

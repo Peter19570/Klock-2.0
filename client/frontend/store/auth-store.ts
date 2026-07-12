@@ -10,6 +10,7 @@ interface AuthState {
   status: AuthStatus;
   setAuth: (accessToken: string, user: UserDetailedResponse) => void;
   setAccessToken: (accessToken: string) => void;
+  updateUser: (patch: Partial<UserDetailedResponse>) => void;
   clearAuth: () => void;
   setStatus: (status: AuthStatus) => void;
 }
@@ -20,6 +21,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   status: "idle",
   setAuth: (accessToken, user) => set({ accessToken, user, status: "authenticated" }),
   setAccessToken: (accessToken) => set({ accessToken }),
+  updateUser: (patch) =>
+    set((state) => (state.user ? { user: { ...state.user, ...patch } } : state)),
   clearAuth: () => set({ accessToken: null, user: null, status: "unauthenticated" }),
   setStatus: (status) => set({ status }),
 }));

@@ -1,3 +1,4 @@
+import { parseApiResponse } from "@/lib/api/api-error";
 import { backendFetch } from "@/lib/api/backend-client";
 import type { components } from "@/lib/api/generated/schema";
 
@@ -132,4 +133,46 @@ export async function confirmEmailChange(token: string): Promise<{ error?: strin
     return { error: payload.msg ?? "Failed to confirm email change" };
   }
   return {};
+}
+
+export interface AvatarInitializeResponse {
+  signature: string;
+  timeStamp: number;
+  customPublicId: string;
+  apiKey: string;
+  cloudName: string;
+  folder: string;
+  uploadPreset: string;
+  context: string;
+}
+
+export async function initializeAvatarUpload(): Promise<{
+  data?: AvatarInitializeResponse;
+  error?: string;
+}> {
+  try {
+    const res = await backendFetch("/api/v1/avatar/initialize", {
+      method: "POST",
+    });
+    const data = await parseApiResponse<AvatarInitializeResponse>(res);
+    return { data };
+  } catch (e) {
+    return {
+      error: e instanceof Error ? e.message : "Couldn't start avatar upload",
+    };
+  }
+}
+
+export async function deleteAvatar(): Promise<{ error?: string }> {
+  try {
+    const res = await backendFetch("/api/v1/users/me/avatar", {
+      method: "DELETE",
+    });
+    await parseApiResponse<void>(res);
+    return {};
+  } catch (e) {
+    return {
+      error: e instanceof Error ? e.message : "Couldn't delete avatar",
+    };
+  }
 }

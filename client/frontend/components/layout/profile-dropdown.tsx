@@ -63,7 +63,10 @@ export function ProfileDropdown() {
   const [profileOpen, setProfileOpen] = useState(false);
 
   async function handleSignOut() {
-    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    // fire the revoke request but don't block on it — clear + redirect immediately.
+    // route.ts still revokes server-side before clearing the cookie; a failed
+    // revoke here just means the refresh token expires naturally later.
+    fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
     clearAuth();
     router.push("/login");
   }

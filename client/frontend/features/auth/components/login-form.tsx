@@ -15,6 +15,25 @@ import type { components } from "@/lib/api/generated/schema";
 type ApiResponseUserDetailedResponse =
   components["schemas"]["ApiResponseUserDetailedResponse"];
 
+function getLoginErrorMessage(status: number, msg?: string): string {
+  const normalized = msg?.toLowerCase() ?? "";
+
+  if (status === 401 || normalized.includes("unauthorized")) {
+    return "Incorrect email or password";
+  }
+  if (
+    status === 403 ||
+    normalized.includes("locked") ||
+    normalized.includes("disabled")
+  ) {
+    return "Your account is locked or disabled. Contact your administrator.";
+  }
+  if (status >= 500) {
+    return "Something went wrong on our end. Please try again shortly.";
+  }
+  return msg ?? "Couldn't sign in. Please try again.";
+}
+
 export function LoginForm() {
   const router = useRouter();
   const setAuth = useAuthStore((s) => s.setAuth);
@@ -36,7 +55,7 @@ export function LoginForm() {
     const payload = await res.json();
 
     if (!res.ok) {
-      setError(payload.msg ?? "Invalid email or password");
+      setError(getLoginErrorMessage(res.status, payload.msg));
       setLoading(false);
       return;
     }
