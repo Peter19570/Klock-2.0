@@ -73,6 +73,7 @@ public class BranchController {
     }
 
     @GetMapping("/active")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ApiResponse<BranchUserResponse>> getDetailedBranchForUser(
             @AuthenticationPrincipal CustomUserPrincipal principal){
         BranchUserResponse response = branchService.getDetailedBranchForUser(principal);

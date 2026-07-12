@@ -4,6 +4,7 @@ import {
   Users,
   FileClock,
   Building2,
+  Landmark,
   ShieldAlert,
   type LucideIcon,
 } from "lucide-react";
@@ -16,6 +17,7 @@ export type NavItem = {
   href: string;
   icon: LucideIcon;
   roles: UserRole[];
+  labelOverrides?: Partial<Record<UserRole, string>>;
 };
 
 export const PANEL_NAV_ITEMS: NavItem[] = [
@@ -48,6 +50,14 @@ export const PANEL_NAV_ITEMS: NavItem[] = [
     href: "/branches",
     icon: Building2,
     roles: ["ADMIN", "SUPER_ADMIN"],
+    labelOverrides: { ADMIN: "Branch" },
+  },
+  {
+    label: "Organization",
+    href: "/organization",
+    icon: Landmark,
+    roles: ["SUPER_ADMIN"],
+    labelOverrides: { ADMIN: "Company" },
   },
   {
     label: "Audit Logs",
@@ -59,5 +69,10 @@ export const PANEL_NAV_ITEMS: NavItem[] = [
 
 export function getNavItemsForRole(role: UserRole | undefined): NavItem[] {
   if (!role) return [];
-  return PANEL_NAV_ITEMS.filter((item) => item.roles.includes(role));
+  return PANEL_NAV_ITEMS.filter((item) => item.roles.includes(role)).map(
+    (item) => ({
+      ...item,
+      label: item.labelOverrides?.[role] ?? item.label,
+    }),
+  );
 }

@@ -122,6 +122,7 @@ frontend/
 │   ├── sessions
 │   │   └── components
 │   │       ├── clock-events-subtable.tsx
+│   │       ├── export-sessions-dialog.tsx
 │   │       ├── recent-sessions.tsx
 │   │       └── session-table.tsx
 │   └── users
