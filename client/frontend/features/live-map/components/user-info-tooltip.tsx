@@ -16,7 +16,10 @@ function timeAgo(isoTimestamp: string): string {
   const seconds = Math.round(ms / 1000);
   if (seconds < 5) return "just now";
   if (seconds < 60) return `${seconds}s ago`;
-  return `${Math.round(seconds / 60)}m ago`;
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.round(minutes / 60);
+  return `${hours}h ago`;
 }
 
 // clockEventStatus values are freeform strings from the backend for now —

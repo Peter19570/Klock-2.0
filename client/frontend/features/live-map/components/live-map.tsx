@@ -22,6 +22,8 @@ import { BranchSelector } from "./branch-selector";
 import type { components } from "@/lib/api/generated/schema";
 import { UserInfoTooltip } from "./user-info-tooltip";
 import { Building2 } from "lucide-react";
+import { ArrowUp } from "lucide-react";
+import { BranchInfoCard } from "./branch-info-card";
 
 type BranchResponse = components["schemas"]["BranchResponse"];
 type BranchDetailedResponse = components["schemas"]["BranchDetailedResponse"];
@@ -75,23 +77,93 @@ function userIcon() {
   });
 }
 
-function timeAgo(isoTimestamp: string): string {
-  const ms = Date.now() - new Date(isoTimestamp).getTime();
-  // If your backend actually sends epoch millis as a string instead of ISO,
-  // swap the line above for: const ms = Date.now() - Number(isoTimestamp);
-  if (Number.isNaN(ms)) return "unknown";
-  const seconds = Math.round(ms / 1000);
-  if (seconds < 5) return "just now";
-  if (seconds < 60) return `${seconds}s ago`;
-  return `${Math.round(seconds / 60)}m ago`;
-}
-
-function FlyToBranch({ target }: { target: [number, number] | null }) {
+function FlyToBranch({ lat, lon }: { lat: number | null; lon: number | null }) {
   const map = useMap();
   useEffect(() => {
-    if (target) map.flyTo(target, 16, { duration: 1.2 });
-  }, [target, map]);
+    if (lat != null && lon != null) {
+      map.flyTo([lat, lon], 16, { duration: 1.2 });
+    }
+    // primitives, not an array literal — this is what stops it re-firing
+    // every time an unrelated re-render (e.g. a websocket tick) creates a
+    // structurally-identical-but-referentially-new target array.
+  }, [lat, lon, map]);
   return null;
+}
+
+function BranchReturnIndicator({
+  lat,
+  lon,
+}: {
+  lat: number | null;
+  lon: number | null;
+}) {
+  const map = useMap();
+  const [state, setState] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    angleDeg: number;
+  }>({ visible: false, x: 0, y: 0, angleDeg: 0 });
+
+  useEffect(() => {
+    if (lat == null || lon == null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setState((s) => (s.visible ? { ...s, visible: false } : s));
+      return;
+    }
+
+    const target = L.latLng(lat, lon);
+    const PADDING = 48;
+
+    function recompute() {
+      const bounds = map.getBounds();
+      if (bounds.contains(target)) {
+        setState((s) => (s.visible ? { ...s, visible: false } : s));
+        return;
+      }
+      const size = map.getSize();
+      const point = map.latLngToContainerPoint(target);
+      const centerX = size.x / 2;
+      const centerY = size.y / 2;
+      const clampedX = Math.min(Math.max(point.x, PADDING), size.x - PADDING);
+      const clampedY = Math.min(Math.max(point.y, PADDING), size.y - PADDING);
+      const angleDeg =
+        (Math.atan2(point.y - centerY, point.x - centerX) * 180) / Math.PI + 90;
+      setState({ visible: true, x: clampedX, y: clampedY, angleDeg });
+    }
+
+    recompute();
+    map.on("move", recompute);
+    map.on("zoom", recompute);
+    map.on("resize", recompute);
+
+    return () => {
+      map.off("move", recompute);
+      map.off("zoom", recompute);
+      map.off("resize", recompute);
+    };
+  }, [lat, lon, map]);
+
+  if (!state.visible || lat == null || lon == null) return null;
+
+  return (
+    <button
+      type="button"
+      onClick={() => map.flyTo([lat, lon], 16, { duration: 1.2 })}
+      style={{
+        left: state.x,
+        top: state.y,
+        transform: "translate(-50%, -50%)",
+      }}
+      className="absolute z-1000 flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-lg transition-transform hover:scale-105"
+    >
+      <ArrowUp
+        className="h-3.5 w-3.5 text-primary"
+        style={{ transform: `rotate(${state.angleDeg}deg)` }}
+      />
+      Back to branch
+    </button>
+  );
 }
 
 export function LiveMap() {
@@ -129,11 +201,6 @@ export function LiveMap() {
     () => branches.find((b) => b.id === selectedId) ?? null,
     [branches, selectedId],
   );
-
-  const flyTarget: [number, number] | null =
-    selectedBranch?.latitude != null && selectedBranch?.longitude != null
-      ? [selectedBranch.latitude, selectedBranch.longitude]
-      : null;
 
   const center: [number, number] = isSuperAdmin
     ? branches[0]?.latitude != null && branches[0]?.longitude != null
@@ -182,11 +249,15 @@ export function LiveMap() {
                     position={[b.latitude, b.longitude]}
                     icon={branchIcon()}
                   >
-                    <Popup>
-                      <div className="text-sm font-medium">{b.displayName}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {b.currentActiveCount ?? 0} active now
-                      </div>
+                    <Popup
+                      closeButton={false}
+                      className="[&_.leaflet-popup-content-wrapper]:rounded-xl! [&_.leaflet-popup-content-wrapper]:border! [&_.leaflet-popup-content-wrapper]:border-border! [&_.leaflet-popup-content-wrapper]:bg-card! [&_.leaflet-popup-content-wrapper]:p-0! [&_.leaflet-popup-content-wrapper]:shadow-lg! [&_.leaflet-popup-content]:m-0! [&_.leaflet-popup-content]:w-auto! [&_.leaflet-popup-tip]:bg-card! [&_.leaflet-popup-tip]:shadow-none!"
+                    >
+                      <BranchInfoCard
+                        displayName={b.displayName}
+                        branchStatus={b.branchStatus}
+                        radius={b.radius}
+                      />
                     </Popup>
                   </Marker>
                   {b.radius != null && (
@@ -211,13 +282,17 @@ export function LiveMap() {
                   position={[myBranch.latitude, myBranch.longitude]}
                   icon={branchIcon()}
                 >
-                  <Popup>
-                    <div className="text-sm font-medium">
-                      {myBranch.displayName}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {myBranch.currentActiveCount ?? 0} active now
-                    </div>
+                  <Popup
+                    closeButton={false}
+                    className="[&_.leaflet-popup-content-wrapper]:rounded-xl! [&_.leaflet-popup-content-wrapper]:border! [&_.leaflet-popup-content-wrapper]:border-border! [&_.leaflet-popup-content-wrapper]:bg-card! [&_.leaflet-popup-content-wrapper]:p-0! [&_.leaflet-popup-content-wrapper]:shadow-lg! [&_.leaflet-popup-content]:m-0! [&_.leaflet-popup-content]:w-auto! [&_.leaflet-popup-tip]:bg-card! [&_.leaflet-popup-tip]:shadow-none!"
+                  >
+                    <BranchInfoCard
+                      displayName={myBranch.displayName}
+                      branchStatus={myBranch.branchStatus}
+                      radius={myBranch.radius}
+                      shiftStart={myBranch.shiftStart}
+                      shiftEnd={myBranch.shiftEnd}
+                    />
                   </Popup>
                 </Marker>
                 {myBranch.radius != null && (
@@ -254,7 +329,14 @@ export function LiveMap() {
           );
         })}
 
-        <FlyToBranch target={flyTarget} />
+        <FlyToBranch
+          lat={selectedBranch?.latitude ?? null}
+          lon={selectedBranch?.longitude ?? null}
+        />
+        <BranchReturnIndicator
+          lat={selectedBranch?.latitude ?? null}
+          lon={selectedBranch?.longitude ?? null}
+        />
       </MapContainer>
     </div>
   );
