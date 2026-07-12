@@ -106,9 +106,11 @@ frontend/
 │   │   └── api.ts
 │   ├── branches
 │   │   ├── components
+│   │   │   ├── admin-branch-view.tsx
 │   │   │   ├── branch-detail-modal.tsx
 │   │   │   ├── branch-form-dialog.tsx
-│   │   │   └── branch-table.tsx
+│   │   │   ├── branch-table.tsx
+│   │   │   └── super-admin-branches-view.tsx
 │   │   └── api.ts
 │   ├── dashboard
 │   │   ├── components

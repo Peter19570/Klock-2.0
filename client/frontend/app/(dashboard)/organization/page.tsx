@@ -1,8 +1,7 @@
 "use client";
 
-import { useAuthStore } from "@/store/auth-store";
+import { AdminOrgView } from "@/features/organization/components/admin-org-view";
 
 export default function OrganizationPage() {
-  const user = useAuthStore((s) => s.user);
-  return <p>Org settings — role: {user?.userRole}</p>;
+  return <AdminOrgView />;
 }
