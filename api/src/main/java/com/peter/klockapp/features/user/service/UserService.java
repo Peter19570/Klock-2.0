@@ -34,12 +34,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -150,7 +152,14 @@ public class UserService {
             user.setBranch(branch);
         }
 
-        if (user.getUserRole().equals(UserRole.ADMIN) && (request.branchId() != null || request.userRole() != null)){
+        List<String> roles = principal.authorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        boolean isAdmin = roles.contains("ROLE_ADMIN");
+        boolean isChangingBranchOrRole = request.branchId() != null || request.userRole() != null;
+
+        if (isAdmin && isChangingBranchOrRole) {
             throw new IllegalStateException("Admins cannot change user role or branch");
         }
 
