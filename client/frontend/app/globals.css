@@ -141,13 +141,9 @@
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
 }
 
-/* .no-scrollbar::-webkit-scrollbar {
-  display: none;
+.theme-transitioning * {
+  transition: none !important;
 }
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-} */
 
 @layer utilities {
   .scrollbar-hide {

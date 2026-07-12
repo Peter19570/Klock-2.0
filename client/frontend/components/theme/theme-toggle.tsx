@@ -78,6 +78,7 @@ function ThemeIcon({ mode }: { mode: "light" | "dark" | "system" }) {
     >
       {/* Sun */}
       <motion.g
+        initial={false}
         animate={{
           scale: mode === "light" ? 1 : 0,
           opacity: mode === "light" ? 1 : 0,
@@ -101,6 +102,7 @@ function ThemeIcon({ mode }: { mode: "light" | "dark" | "system" }) {
 
       {/* Moon */}
       <motion.g
+        initial={false}
         animate={{
           scale: mode === "dark" ? 1 : 0,
           opacity: mode === "dark" ? 1 : 0,
@@ -119,6 +121,7 @@ function ThemeIcon({ mode }: { mode: "light" | "dark" | "system" }) {
 
       {/* System / monitor */}
       <motion.g
+        initial={false}
         animate={{
           scale: mode === "system" ? 1 : 0,
           opacity: mode === "system" ? 1 : 0,

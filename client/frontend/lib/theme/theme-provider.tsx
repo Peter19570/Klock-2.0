@@ -14,11 +14,20 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function getSystemTheme(): "light" | "dark" {
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 }
 
 function applyTheme(resolved: "light" | "dark") {
-  document.documentElement.classList.toggle("dark", resolved === "dark");
+  const root = document.documentElement;
+  root.classList.add("theme-transitioning");
+  root.classList.toggle("dark", resolved === "dark");
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      root.classList.remove("theme-transitioning");
+    });
+  });
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -26,7 +35,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
-    const stored = (localStorage.getItem(STORAGE_KEY) as Theme | null) ?? "system";
+    const stored =
+      (localStorage.getItem(STORAGE_KEY) as Theme | null) ?? "system";
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setThemeState(stored);
     const resolved = stored === "system" ? getSystemTheme() : stored;
     setResolvedTheme(resolved);
