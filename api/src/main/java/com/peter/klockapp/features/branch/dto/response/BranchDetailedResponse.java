@@ -20,8 +20,7 @@ public record BranchDetailedResponse(
         String geofenceName,
         Instant createdAt,
 
-        Double avgDistance,
-        double displayAvg,
+        double avgClockInDistanceFromBranch,
         String status,
 
         long geofenceExitTimeoutMinutes,

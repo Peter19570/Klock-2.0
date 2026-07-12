@@ -885,9 +885,7 @@ export interface components {
             /** Format: date-time */
             createdAt?: string;
             /** Format: double */
-            avgDistance?: number;
-            /** Format: double */
-            displayAvg?: number;
+            avgClockInDistanceFromBranch?: number;
             status?: string;
             /** Format: int64 */
             geofenceExitTimeoutMinutes?: number;

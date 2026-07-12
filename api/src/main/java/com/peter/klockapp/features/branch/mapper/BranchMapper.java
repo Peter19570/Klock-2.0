@@ -21,15 +21,13 @@ public interface BranchMapper {
     @Mapping(target = "totalEmployees", source = "employees")
     @Mapping(target = "totalAdmins", source = "admins")
     @Mapping(target = "currentActiveCount", source = "activeNow")
-    @Mapping(target = "avgDistance", source = "avgDistance")
-    @Mapping(target = "displayAvg", source = "displayAvg")
+    @Mapping(target = "avgClockInDistanceFromBranch", source = "displayAvg")
     @Mapping(target = "status", source = "status")
     BranchDetailedResponse toDetailedDto(
             Branch branch,
             long activeNow,
             long employees,
             long admins,
-            Double avgDistance,
             double displayAvg,
             String status
     );

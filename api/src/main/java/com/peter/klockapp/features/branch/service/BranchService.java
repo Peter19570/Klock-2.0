@@ -93,11 +93,11 @@ public class BranchService {
                         branch.getId(), currentUser.getOrganization().getId());
 
         double displayAvg = (avgDistance != null) ? avgDistance : 0.0;
+
         String status = (displayAvg <= branch.getRadius()) ? "STABLE" : "DRIFTING";
 
         return branchMapper.toDetailedDto(
-                branch, activeNow, employees, admins,
-                avgDistance, displayAvg, status
+                branch, activeNow, employees, admins, displayAvg, status
         );
     }
 
