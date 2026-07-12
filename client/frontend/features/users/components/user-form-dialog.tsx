@@ -89,6 +89,11 @@ export function UserFormDialog({
       return;
     }
 
+    if (showRoleAndBranch && !userRole) {
+      setError("Role is required.");
+      return;
+    }
+
     setLoading(true);
 
     if (mode === "create") {
@@ -191,7 +196,7 @@ export function UserFormDialog({
           {showRoleAndBranch && (
             <>
               <div className="space-y-1.5">
-                <Label>Role</Label>
+                <Label>Role *</Label>
                 <EnumSelect
                   value={userRole}
                   onChange={setUserRole}
