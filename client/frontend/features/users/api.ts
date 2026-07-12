@@ -30,6 +30,13 @@ function buildQuery<T extends object>(params: T) {
   return s ? `?${s}` : "";
 }
 
+export async function fetchCurrentUser(): Promise<UserDetailedResponse | undefined> {
+  const res = await backendFetch(`/api/v1/users/me`);
+  if (!res.ok) return undefined;
+  const payload = await res.json();
+  return payload.data;
+}
+
 export async function fetchUsers(
   filters: UserFilters,
 ): Promise<PageResponseUserResponse | undefined> {
@@ -104,4 +111,25 @@ export async function fetchBranchOptions(
   if (!res.ok) return [];
   const payload = await res.json();
   return payload.data?.content ?? [];
+}
+
+export async function requestEmailChange(newEmail: string): Promise<{ error?: string }> {
+  const res = await backendFetch("/api/v1/auth/change-email", {
+    method: "POST",
+    body: JSON.stringify({ newEmail }),
+  });
+  if (!res.ok) {
+    const payload = await res.json().catch(() => ({}));
+    return { error: payload.msg ?? "Failed to request email change" };
+  }
+  return {};
+}
+
+export async function confirmEmailChange(token: string): Promise<{ error?: string }> {
+  const res = await backendFetch(`/api/v1/auth/confirm-email?token=${encodeURIComponent(token)}`);
+  if (!res.ok) {
+    const payload = await res.json().catch(() => ({}));
+    return { error: payload.msg ?? "Failed to confirm email change" };
+  }
+  return {};
 }

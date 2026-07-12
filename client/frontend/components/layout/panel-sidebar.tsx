@@ -5,9 +5,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronsUpDown, LogOut, Settings, UserCircle, X } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +18,7 @@ import {
 import { useAuthStore } from "@/store/auth-store";
 import { useUIStore } from "@/store/ui-store";
 import { getNavItemsForRole } from "@/config/nav";
+import { ProfileModal } from "@/features/users/components/profile-modal";
 
 const sidebarVariants = {
   open: { width: "15rem" },
@@ -29,7 +30,6 @@ const contentVariants = {
   closed: { display: "block", opacity: 1 },
 };
 
-// label slide/fade-in animation — now actually used below
 const variants = {
   open: {
     x: 0,
@@ -58,28 +58,49 @@ function AccountBlock({
   name,
   email,
   initials,
+  picture,
+  onCollapse,
 }: {
   isCollapsed: boolean;
   name?: string;
   email?: string;
   initials: string;
+  picture?: string;
+  onCollapse?: () => void;
 }) {
+  const router = useRouter();
+  const clearAuth = useAuthStore((s) => s.clearAuth);
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  function openProfile() {
+    setProfileOpen(true);
+    onCollapse?.();
+  }
+
+  async function handleSignOut() {
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    clearAuth();
+    router.push("/login");
+  }
+
   return (
     <div className="flex flex-col p-2">
-      <Link
-        href="/settings/profile"
+      <button
+        type="button"
+        onClick={openProfile}
         className="flex h-8 w-full flex-row items-center rounded-md px-2 py-1.5 transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
       >
         <Settings className="h-4 w-4 shrink-0" />
         <motion.span variants={variants}>
           {!isCollapsed && <p className="ml-2 text-sm font-medium">Settings</p>}
         </motion.span>
-      </Link>
+      </button>
 
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger className="w-full">
           <div className="flex h-8 w-full flex-row items-center gap-2 rounded-md px-2 py-1.5 transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
             <Avatar className="size-4">
+              {picture && <AvatarImage src={picture} alt="" />}
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
             <motion.span
@@ -98,6 +119,7 @@ function AccountBlock({
         <DropdownMenuContent sideOffset={5}>
           <div className="flex flex-row items-center gap-2 p-2">
             <Avatar className="size-6">
+              {picture && <AvatarImage src={picture} alt="" />}
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col text-left">
@@ -108,20 +130,28 @@ function AccountBlock({
             </div>
           </div>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="p-0">
-            <Link
-              href="/settings/profile"
-              className="flex w-full items-center gap-2 px-2 py-2"
-            >
-              <UserCircle className="h-4 w-4" /> Profile
-            </Link>
+          <DropdownMenuItem
+            onClick={openProfile}
+            className="flex items-center gap-2"
+          >
+            <UserCircle className="h-4 w-4" /> Profile
           </DropdownMenuItem>
-          <DropdownMenuItem className="flex items-center gap-2">
-            {/* TODO: wire to your actual logout mutation from features/auth/api.ts */}
+          <DropdownMenuItem
+            onClick={handleSignOut}
+            className="flex items-center gap-2 text-destructive focus:text-destructive"
+          >
             <LogOut className="h-4 w-4" /> Sign out
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <ProfileModal
+        open={profileOpen}
+        onOpenChange={(o) => {
+          setProfileOpen(o);
+          onCollapse?.();
+        }}
+      />
     </div>
   );
 }
@@ -171,6 +201,7 @@ export function PanelSidebar() {
 
   const name = useAuthStore((s) => s.user?.firstName);
   const email = useAuthStore((s) => s.user?.email);
+  const picture = useAuthStore((s) => s.user?.picture);
   const initials = name?.[0]?.toUpperCase() ?? "U";
 
   return (
@@ -218,6 +249,8 @@ export function PanelSidebar() {
                   name={name}
                   email={email}
                   initials={initials}
+                  picture={picture}
+                  onCollapse={() => setIsCollapsed(true)}
                 />
               </div>
             </div>
@@ -275,6 +308,7 @@ export function PanelSidebar() {
                   name={name}
                   email={email}
                   initials={initials}
+                  picture={picture}
                 />
               </motion.ul>
             </motion.div>

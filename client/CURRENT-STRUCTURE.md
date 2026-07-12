@@ -32,6 +32,7 @@ frontend/
 │   │   │   └── page.tsx
 │   │   ├── users
 │   │   │   └── page.tsx
+│   │   ├── error.tsx
 │   │   └── layout.tsx
 │   ├── api
 │   │   └── auth
@@ -43,8 +44,11 @@ frontend/
 │   │       │   └── route.ts
 │   │       └── register
 │   │           └── route.ts
+│   ├── error.tsx
+│   ├── global-error.tsx
 │   ├── globals.css
 │   ├── layout.tsx
+│   ├── not-found.tsx
 │   └── page.tsx
 ├── components
 │   ├── auth
@@ -129,6 +133,7 @@ frontend/
 │   │       └── use-dashboard-data.ts
 │   ├── live-map
 │   │   ├── components
+│   │   │   ├── branch-info-card.tsx
 │   │   │   ├── branch-selector.tsx
 │   │   │   ├── live-map.tsx
 │   │   │   └── user-info-tooltip.tsx
