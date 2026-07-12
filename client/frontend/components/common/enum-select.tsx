@@ -45,7 +45,12 @@ export function EnumSelect<T extends string>({
           }
         </SelectValue>
       </SelectTrigger>
-      <SelectContent className="border-border bg-card">
+      <SelectContent
+        className="border-border bg-card"
+        side="bottom"
+        align="start"
+        alignItemWithTrigger={false}
+      >
         <SelectItem value={ANY}>{placeholder}</SelectItem>
         {options.map((opt) => (
           <SelectItem key={opt} value={opt}>
