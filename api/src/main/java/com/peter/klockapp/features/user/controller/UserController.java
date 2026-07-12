@@ -13,6 +13,7 @@ import com.peter.klockapp.features.user.dto.response.UserResponse;
 import com.peter.klockapp.features.user.enums.UserRole;
 import com.peter.klockapp.features.user.filters.UserFilter;
 import com.peter.klockapp.features.user.service.UserService;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -122,6 +123,7 @@ public class UserController {
     }
 
     @PostMapping("/me/deletion-request")
+    @Hidden
     public ResponseEntity<Void> requestDeletion(
             @AuthenticationPrincipal CustomUserPrincipal principal) {
         userService.createDeletionRequest(principal);
@@ -129,6 +131,7 @@ public class UserController {
     }
 
     @DeleteMapping("/me")
+    @Hidden
     public ResponseEntity<Void> confirmDeletion(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestBody AccountDeletionRequest request) {
