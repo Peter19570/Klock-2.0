@@ -22,6 +22,7 @@ import { DatePicker } from "@/components/common/date-picker";
 import { EnumSelect } from "@/components/common/enum-select";
 import { cn } from "@/lib/utils";
 import { SlidersHorizontal, ArrowLeft, Download } from "lucide-react";
+import { Pagination } from "@/components/common/pagination";
 
 type PageResponseSessionResponse =
   components["schemas"]["PageResponseSessionResponse"];
@@ -298,37 +299,12 @@ export default function SessionsPage() {
         )}
       </div>
 
-      {pageData && (
-        <div className="mt-4 flex items-center justify-between">
-          <Button
-            variant="outline"
-            disabled={(pageData.pageNumber ?? 0) === 0}
-            onClick={() =>
-              setFilters((f) => ({
-                ...f,
-                page: (pageData.pageNumber ?? 0) - 1,
-              }))
-            }
-          >
-            Previous
-          </Button>
-          <span className="text-xs text-muted-foreground">
-            Page {(pageData.pageNumber ?? 0) + 1} of {pageData.totalPages ?? 1}
-          </span>
-          <Button
-            variant="outline"
-            disabled={pageData.isLast}
-            onClick={() =>
-              setFilters((f) => ({
-                ...f,
-                page: (pageData.pageNumber ?? 0) + 1,
-              }))
-            }
-          >
-            Next
-          </Button>
-        </div>
-      )}
+      <Pagination
+        page={pageData?.pageNumber ?? 0}
+        totalPages={pageData?.totalPages ?? 0}
+        totalElements={pageData?.totalElements}
+        onPageChange={(p) => setFilters((f) => ({ ...f, page: p }))}
+      />
 
       <ExportSessionsDialog open={exportOpen} onOpenChange={setExportOpen} />
 

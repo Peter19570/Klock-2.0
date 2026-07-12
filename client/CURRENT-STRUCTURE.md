@@ -55,6 +55,7 @@ frontend/
 │   │   ├── confirm-dialog.tsx
 │   │   ├── date-picker.tsx
 │   │   ├── enum-select.tsx
+│   │   ├── pagination.tsx
 │   │   ├── time-picker.tsx
 │   │   └── toast.tsx
 │   ├── layout
@@ -95,6 +96,12 @@ frontend/
 │   │   │   ├── use-branch-socket.ts
 │   │   │   └── use-geofence.ts
 │   │   └── api.ts
+│   ├── audits
+│   │   ├── components
+│   │   │   ├── audit-metadata-subtable.tsx
+│   │   │   └── audit-table.tsx
+│   │   ├── api.ts
+│   │   └── constants.ts
 │   ├── auth
 │   │   ├── components
 │   │   │   ├── force-password-change-dialog.tsx
@@ -127,6 +134,13 @@ frontend/
 │   │   │   └── user-info-tooltip.tsx
 │   │   ├── hooks
 │   │   │   └── use-live-users-socket.ts
+│   │   └── api.ts
+│   ├── organization
+│   │   ├── components
+│   │   │   ├── admin-org-view.tsx
+│   │   │   ├── delete-organization-dialog.tsx
+│   │   │   ├── organization-detail-modal.tsx
+│   │   │   └── organization-form-dialog.tsx
 │   │   └── api.ts
 │   ├── sessions
 │   │   └── components

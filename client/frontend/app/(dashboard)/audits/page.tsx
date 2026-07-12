@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { EnumSelect } from "@/components/common/enum-select";
 import { DatePicker } from "@/components/common/date-picker";
 import { Pagination } from "@/components/common/pagination";
@@ -13,18 +15,26 @@ import {
   type AuditAction,
   type AuditResponse,
 } from "@/features/audits/api";
+import { cn } from "@/lib/utils";
+import { SlidersHorizontal } from "lucide-react";
 
 export default function AuditsPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const page = Number(searchParams.get("page") ?? 0);
+  const fullName = searchParams.get("fullName") ?? "";
+  const auditAction =
+    (searchParams.get("auditAction") as AuditAction | null) ?? undefined;
+  const minCreatedAt = searchParams.get("minCreatedAt") ?? undefined;
+  const maxCreatedAt = searchParams.get("maxCreatedAt") ?? undefined;
+
   const [audits, setAudits] = useState<AuditResponse[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-
-  const [fullName, setFullName] = useState("");
-  const [auditAction, setAuditAction] = useState<AuditAction | undefined>();
-  const [minCreatedAt, setMinCreatedAt] = useState<string | undefined>();
-  const [maxCreatedAt, setMaxCreatedAt] = useState<string | undefined>();
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -43,6 +53,35 @@ export default function AuditsPage() {
     });
   }, [page, fullName, auditAction, minCreatedAt, maxCreatedAt]);
 
+  function updateParams(
+    updates: Record<string, string | undefined>,
+    resetPage = true,
+  ) {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value) params.set(key, value);
+      else params.delete(key);
+    });
+    if (resetPage) params.set("page", "0");
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }
+
+  function setPage(newPage: number) {
+    updateParams({ page: String(newPage) }, false);
+  }
+
+  function clearFilters() {
+    router.replace(pathname, { scroll: false });
+  }
+
+  const activeFilterCount = [
+    fullName,
+    auditAction,
+    minCreatedAt,
+    maxCreatedAt,
+  ].filter(Boolean).length;
+  const hasActiveFilters = activeFilterCount > 0;
+
   return (
     <div className="pb-16 pt-8">
       <div>
@@ -52,44 +91,89 @@ export default function AuditsPage() {
         </p>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Input
-          placeholder="Search by name..."
-          value={fullName}
-          onChange={(e) => {
-            setPage(0);
-            setFullName(e.target.value);
-          }}
-        />
-        <EnumSelect
-          value={auditAction}
-          onChange={(v) => {
-            setPage(0);
-            setAuditAction(v);
-          }}
-          options={AUDIT_ACTIONS}
-          placeholder="Any action"
-          formatLabel={formatAuditAction}
-        />
-        <DatePicker
-          value={minCreatedAt}
-          onChange={(v) => {
-            setPage(0);
-            setMinCreatedAt(v);
-          }}
-          placeholder="From date"
-        />
-        <DatePicker
-          value={maxCreatedAt}
-          onChange={(v) => {
-            setPage(0);
-            setMaxCreatedAt(v);
-          }}
-          placeholder="To date"
-        />
+      <button
+        type="button"
+        onClick={() => setMobileFiltersOpen((v) => !v)}
+        className="mt-6 flex w-full items-center justify-between rounded-2xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground shadow-sm md:hidden"
+      >
+        <span className="flex items-center gap-2">
+          <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+          Filters
+          {activeFilterCount > 0 && (
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground">
+              {activeFilterCount}
+            </span>
+          )}
+        </span>
+        <span
+          className={cn(
+            "text-muted-foreground transition-transform",
+            mobileFiltersOpen && "rotate-180",
+          )}
+        >
+          ▾
+        </span>
+      </button>
+
+      <div
+        className={cn(
+          "mt-4 grid-cols-1 gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm sm:grid-cols-2 md:mt-6 md:grid md:grid-cols-3 lg:grid-cols-5",
+          mobileFiltersOpen ? "grid" : "hidden md:grid",
+        )}
+      >
+        <div className="space-y-1.5">
+          <Label htmlFor="fullName">Name</Label>
+          <Input
+            id="fullName"
+            placeholder="Search by name"
+            value={fullName}
+            onChange={(e) =>
+              updateParams({ fullName: e.target.value || undefined })
+            }
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label>Action</Label>
+          <EnumSelect
+            value={auditAction}
+            onChange={(v) => updateParams({ auditAction: v })}
+            options={AUDIT_ACTIONS}
+            placeholder="Any action"
+            formatLabel={formatAuditAction}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label>From</Label>
+          <DatePicker
+            value={minCreatedAt}
+            onChange={(v) => updateParams({ minCreatedAt: v })}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label>To</Label>
+          <DatePicker
+            value={maxCreatedAt}
+            onChange={(v) => updateParams({ maxCreatedAt: v })}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="invisible">Clear</Label>
+          <button
+            type="button"
+            onClick={clearFilters}
+            disabled={!hasActiveFilters}
+            className="h-10 w-full rounded-(--radius) border border-border text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+          >
+            Clear all
+          </button>
+        </div>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-6">
         {loading ? (
           <div className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
             Loading audit log...
