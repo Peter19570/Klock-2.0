@@ -229,6 +229,12 @@ public class AuthService {
 
     public void resendVerificationEmail(CustomUserPrincipal principal){
         User user = userService.fetchCurrentUser(principal);
+        boolean isUserEmailVerified = user.isEmailVerified();
+
+        if (isUserEmailVerified){
+            throw new IllegalStateException("Your email has been verifies already");
+        }
+
         eventPublisher.publishEvent(user);
     }
 
