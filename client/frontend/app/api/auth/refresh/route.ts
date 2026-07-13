@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { API_BASE_URL, REFRESH_COOKIE_NAME } from "@/lib/api/config";
+import { SERVER_API_BASE_URL, REFRESH_COOKIE_NAME } from "@/lib/api/config";
 import type { components } from "@/lib/api/generated/schema";
 
 type ApiResponseTokenResponse = components["schemas"]["ApiResponseTokenResponse"];
@@ -13,7 +13,7 @@ export async function POST() {
     return NextResponse.json({ msg: "No refresh token" }, { status: 401 });
   }
 
-  const backendRes = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
+  const backendRes = await fetch(`${SERVER_API_BASE_URL}/api/v1/auth/refresh`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ refreshToken }),

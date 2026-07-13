@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import { API_BASE_URL, REFRESH_COOKIE_NAME } from "@/lib/api/config";
+import { SERVER_API_BASE_URL, REFRESH_COOKIE_NAME } from "@/lib/api/config";
 import type { components } from "@/lib/api/generated/schema";
 
 type ApiResponseOrganizationResponse = components["schemas"]["ApiResponseOrganizationResponse"];
 
 export async function POST(request: Request) {
-  const body = await request.json(); // OrganizationRequest shape
+  const body = await request.json();
 
-  const backendRes = await fetch(`${API_BASE_URL}/api/v1/organization`, {
+  const backendRes = await fetch(`${SERVER_API_BASE_URL}/api/v1/organization`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
