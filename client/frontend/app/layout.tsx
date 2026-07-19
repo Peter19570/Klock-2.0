@@ -53,6 +53,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <link rel="icon" href="/klock-logo.png" type="image/png" />
         <script dangerouslySetInnerHTML={{ __html: noFlashThemeScript }} />
       </head>
       <body>

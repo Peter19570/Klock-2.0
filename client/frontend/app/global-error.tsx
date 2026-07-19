@@ -1,5 +1,6 @@
 "use client";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { useEffect } from "react";
 
 export default function GlobalError({
@@ -9,6 +10,7 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  usePageTitle("Application error");
   useEffect(() => {
     console.error(error);
   }, [error]);
