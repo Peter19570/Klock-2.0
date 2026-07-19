@@ -168,7 +168,8 @@ frontend/
 │   ├── use-auto-marquee.ts
 │   ├── use-count-up.ts
 │   ├── use-geolocation.ts
-│   └── use-is-mobile.ts
+│   ├── use-is-mobile.ts
+│   └── use-page-title.ts
 ├── lib
 │   ├── api
 │   │   ├── generated
@@ -191,6 +192,7 @@ frontend/
 ├── public
 │   ├── file.svg
 │   ├── globe.svg
+│   ├── klock-logo.png
 │   ├── next.svg
 │   ├── vercel.svg
 │   └── window.svg

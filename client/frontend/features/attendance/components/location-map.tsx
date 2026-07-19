@@ -62,14 +62,14 @@ export function LocationMap({
       onMouseLeave={handleMouseLeave}
     >
       <motion.div
-        className="relative h-[220px] w-full overflow-hidden rounded-2xl border border-border bg-background sm:h-[280px]"
+        className="relative h-55 w-full overflow-hidden rounded-2xl border border-border bg-background sm:h-70"
         style={{
           rotateX: pointerFine ? springRotateX : 0,
           rotateY: pointerFine ? springRotateY : 0,
           transformStyle: "preserve-3d",
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-muted/20 via-transparent to-muted/40" />
+        <div className="absolute inset-0 bg-linear-to-br from-muted/20 via-transparent to-muted/40" />
 
         <motion.div
           className="pointer-events-none absolute inset-0"
@@ -222,7 +222,7 @@ export function LocationMap({
             </svg>
           </motion.div>
 
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-60" />
+          <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-transparent opacity-60" />
         </motion.div>
 
         <div className="relative z-10 flex h-full flex-col justify-between p-5">
@@ -276,7 +276,7 @@ export function LocationMap({
               {coordinates ?? "—"}
             </p>
             <motion.div
-              className="h-px bg-gradient-to-r from-emerald-500/50 via-emerald-400/30 to-transparent"
+              className="h-px bg-linear-to-r from-emerald-500/50 via-emerald-400/30 to-transparent"
               initial={{ scaleX: 0.3, originX: 0 }}
               animate={{ scaleX: isHovered ? 1 : 0.6 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
