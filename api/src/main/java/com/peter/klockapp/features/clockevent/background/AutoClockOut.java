@@ -17,7 +17,7 @@ public class AutoClockOut {
 
     private final ClockEventRepo clockEventRepo;
 
-    @Scheduled(fixedRate = 50000)
+    @Scheduled(fixedRate = 300_000) // Currently set to 5 min
     public void autoClockOutAfterBranchEndShiftTime() {
         int totalUpdated = clockEventRepo.autoClockOutExpiredSessions();
 

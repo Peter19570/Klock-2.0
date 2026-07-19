@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export default function DashboardError({
   error,
@@ -11,6 +13,9 @@ export default function DashboardError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const router = useRouter();
+  usePageTitle("Error");
+
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -29,10 +34,19 @@ export default function DashboardError({
           leaving the page.
         </p>
 
-        <Button variant="outline" onClick={reset} className="mt-6 gap-1.5">
-          <RotateCcw className="h-4 w-4" />
-          Try again
-        </Button>
+        <div className="mt-6 flex gap-3">
+          <Button
+            variant="outline"
+            onClick={() => {
+              router.refresh();
+              reset();
+            }}
+            className="gap-1.5"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Try again
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { KlockLogo } from "@/components/brand/klock-logo";
 import { Button } from "@/components/ui/button";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "404 - Not Found",
+};
 
 export default function NotFound() {
   return (
