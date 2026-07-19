@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronsUpDown, LogOut, Settings, UserCircle, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -194,6 +195,27 @@ function NavLinks({
   );
 }
 
+/** Reusable brand logo block — shows logo icon always, text on expand */
+function SidebarBrand({ isCollapsed }: { isCollapsed: boolean }) {
+  return (
+    <div className="flex items-center gap-2">
+      <Image
+        src="/klock-logo.png"
+        alt="Klock"
+        width={24}
+        height={24}
+        className="h-6 w-6 shrink-0 rounded object-contain"
+        priority
+      />
+      <motion.span variants={variants}>
+        {!isCollapsed && (
+          <span className="text-sm font-semibold tracking-tight">Klock</span>
+        )}
+      </motion.span>
+    </div>
+  );
+}
+
 export function PanelSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const isMobileOpen = useUIStore((s) => s.isPanelSidebarOpen);
@@ -226,15 +248,8 @@ export function PanelSidebar() {
           >
             <div className="flex grow flex-col items-center">
               <div className="flex h-16 w-full shrink-0 items-center border-b border-sidebar-border p-2">
-                <div className="mt-[1.5px] flex w-full items-center gap-2 px-2">
-                  <Avatar className="size-6 rounded">
-                    <AvatarFallback>K</AvatarFallback>
-                  </Avatar>
-                  <motion.li variants={variants}>
-                    {!isCollapsed && (
-                      <p className="text-sm font-medium">Klock</p>
-                    )}
-                  </motion.li>
+                <div className="mt-[1.5px] flex w-full items-center px-2">
+                  <SidebarBrand isCollapsed={isCollapsed} />
                 </div>
               </div>
 
@@ -285,14 +300,7 @@ export function PanelSidebar() {
                 className="flex h-full flex-col"
               >
                 <div className="flex h-13.5 w-full shrink-0 items-center justify-between border-b border-sidebar-border p-2 px-3">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="size-6 rounded">
-                      <AvatarFallback>K</AvatarFallback>
-                    </Avatar>
-                    <motion.li variants={variants}>
-                      <p className="text-sm font-medium">Klock</p>
-                    </motion.li>
-                  </div>
+                  <SidebarBrand isCollapsed={false} />
                   <button onClick={closeMobile} aria-label="Close menu">
                     <X className="h-5 w-5" />
                   </button>
