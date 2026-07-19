@@ -1,19 +1,17 @@
 package com.peter.klockapp.features.auth.constants;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import java.util.List;
 
 public final class CorsConstants {
 
     private CorsConstants() {}
 
-    // remember to set allowed credentials to false if using *
-    // public static final List<String> ALLOWED_ORIGINS = List.of("*");
+    @Value("${app.cors.allowed-origins}")
+    private static List<String> allowedOrigins;
 
-    public static final List<String> ALLOWED_ORIGINS = List.of(
-            "http://localhost:3000",
-            "http://172.20.10.5:3000",
-            "http://192.168.43.138:3000"
-    );
+    public static final List<String> ALLOWED_ORIGINS = allowedOrigins;
 
     public static final List<String> ALLOWED_HEADERS = List.of(
             "Authorization",
