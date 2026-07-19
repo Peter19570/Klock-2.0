@@ -115,7 +115,6 @@ public class ClockEventService {
                         "deviceId", request.deviceId(),
                         "gpsAccuracy", request.accuracy(),
                         "batteryLevel", request.batteryLevel(),
-//                        "signalStrength", request.signalStrength(),
                         "clientTimeStamp", request.clientTimeStamp(),
                         "isDelaySync", request.isDelaySync()
                 )));

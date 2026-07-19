@@ -20,21 +20,21 @@ export const metadata: Metadata = {
   description: "Attendance and workforce tracking",
 };
 
-const noFlashThemeScript = `
-(function () {
-  var authRoutes = ["/login", "/register", "/forgot-password", "/reset-password", "/verify-email"];
-  var isAuthRoute = authRoutes.some(function (p) { return window.location.pathname.startsWith(p); });
-  if (isAuthRoute) {
-    document.documentElement.classList.add("dark");
-    return;
-  }
-  try {
-    var stored = localStorage.getItem("klock-theme") || "system";
-    var isDark = stored === "dark" || (stored === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-    if (isDark) document.documentElement.classList.add("dark");
-  } catch (e) {}
-})();
-`;
+// const noFlashThemeScript = `
+// (function () {
+//   var authRoutes = ["/login", "/register", "/forgot-password", "/reset-password", "/verify-email"];
+//   var isAuthRoute = authRoutes.some(function (p) { return window.location.pathname.startsWith(p); });
+//   if (isAuthRoute) {
+//     document.documentElement.classList.add("dark");
+//     return;
+//   }
+//   try {
+//     var stored = localStorage.getItem("klock-theme") || "system";
+//     var isDark = stored === "dark" || (stored === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+//     if (isDark) document.documentElement.classList.add("dark");
+//   } catch (e) {}
+// })();
+// `;
 
 export default function RootLayout({
   children,
@@ -54,7 +54,7 @@ export default function RootLayout({
     >
       <head>
         <link rel="icon" href="/klock-logo.png" type="image/png" />
-        <script dangerouslySetInnerHTML={{ __html: noFlashThemeScript }} />
+        {/* <script dangerouslySetInnerHTML={{ __html: noFlashThemeScript }} /> */}
       </head>
       <body>
         <AuthProvider>{children}</AuthProvider>

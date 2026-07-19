@@ -23,8 +23,8 @@ public class UserSpecification {
             spec = spec.and((root, query, cb) ->
                     cb.like(
                             cb.concat(
-                                    cb.concat(cb.lower(cb.coalesce(root.get("user").get("firstName"), "")), " "),
-                                    cb.lower(cb.coalesce(root.get("user").get("lastName"), ""))
+                                    cb.concat(cb.lower(cb.coalesce(root.get("firstName"), "")), " "),
+                                    cb.lower(cb.coalesce(root.get("lastName"), ""))
                             ),
                             searchTerm
                     )

@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: [
     "192.168.43.138",
     "172.20.10.5",
+    "172.30.32.1",
     "sandier-unpsychically-rickie.ngrok-free.dev",
   ],
   async rewrites() {

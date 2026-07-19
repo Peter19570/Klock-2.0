@@ -42,14 +42,14 @@ public interface SessionRepo extends JpaRepository<Session, UUID>, JpaSpecificat
             UUID organizationId, UUID branchId);
 
     @Query("SELECT s.workDate as date, COUNT(s) as count FROM Session s " +
-            "WHERE s.workDate > :since AND s.organization.id = :orgId " +
+            "WHERE s.workDate >= :since AND s.organization.id = :orgId " +
             "GROUP BY s.workDate ORDER BY s.workDate ASC")
     List<Object[]> getSessionTrendData(
             @Param("since") LocalDate since,
             @Param("orgId") UUID orgId);
 
     @Query("SELECT s.workDate as date, COUNT(s) as count FROM Session s " +
-            "WHERE s.workDate > :since AND s.branch.id = :branchId AND s.organization.id = :orgId " +
+            "WHERE s.workDate >= :since AND s.branch.id = :branchId AND s.organization.id = :orgId " +
             "GROUP BY s.workDate ORDER BY s.workDate ASC")
     List<Object[]> getSessionTrendDataForBranch(
             @Param("since") LocalDate since,
