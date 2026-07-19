@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { ArrowLeft, SlidersHorizontal } from "lucide-react";
 import { fetchUserById } from "@/features/users/api";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function AuditsPage() {
   usePageTitle("Audits");
@@ -202,13 +203,7 @@ export default function AuditsPage() {
       </div>
 
       <div className="mt-6">
-        {loading ? (
-          <div className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-            Loading audit log...
-          </div>
-        ) : (
-          <AuditTable audits={audits} />
-        )}
+        {loading ? <Spinner size={32} /> : <AuditTable audits={audits} />}
       </div>
 
       <Pagination

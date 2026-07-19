@@ -22,6 +22,7 @@ import {
   type PageResponseBranchResponse,
 } from "@/features/branches/api";
 import { Pagination } from "@/components/common/pagination";
+import { Spinner } from "@/components/ui/spinner";
 
 const STATUS_OPTIONS = ["UNLOCKED", "LOCKED"] as const;
 
@@ -225,9 +226,7 @@ export function SuperAdminBranchesView() {
 
       <div className="mt-6">
         {loading ? (
-          <div className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-            Loading branches...
-          </div>
+          <Spinner size={32} />
         ) : (
           <BranchTable
             branches={branches}

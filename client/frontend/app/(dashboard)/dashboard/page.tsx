@@ -7,19 +7,16 @@ import { SessionTrendChart } from "@/features/dashboard/components/session-trend
 import { ClockOutPieChart } from "@/features/dashboard/components/clock-out-pie-chart";
 import { SessionTable } from "@/features/sessions/components/session-table";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function DashboardPage() {
   usePageTitle("Dashboard");
-  
+
   const user = useAuthStore((s) => s.user);
   const { role, data, loading } = useDashboardData();
 
   if (loading || !data) {
-    return (
-      <p className="pb-16 pt-8 text-sm text-muted-foreground">
-        Loading dashboard...
-      </p>
-    );
+    return <Spinner size={32} />;
   }
 
   const recentSessions = [...(data.recentSessions ?? [])]

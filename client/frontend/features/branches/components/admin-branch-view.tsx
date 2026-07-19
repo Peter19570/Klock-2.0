@@ -17,6 +17,7 @@ import {
   fetchOwnBranch,
   type BranchDetailedResponse,
 } from "@/features/branches/api";
+import { Spinner } from "@/components/ui/spinner";
 
 const STATUS_STYLES: Record<string, string> = {
   UNLOCKED: "bg-emerald-500/10 border-emerald-500/30 text-emerald-500",
@@ -157,9 +158,7 @@ export function AdminBranchView() {
       </div>
 
       {loading || !branch ? (
-        <div className="mt-6 rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-          Loading branch...
-        </div>
+        <Spinner size={32} />
       ) : (
         <>
           <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">

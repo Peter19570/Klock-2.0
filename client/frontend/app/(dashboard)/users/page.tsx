@@ -28,10 +28,11 @@ const ROLE_OPTIONS = ["USER", "ADMIN", "SUPER_ADMIN"] as const;
 import { AnimatePresence, motion } from "framer-motion";
 import { DatePicker } from "@/components/common/date-picker";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function UsersPage() {
   usePageTitle("Users");
-  
+
   const role = useAuthStore((s) => s.user?.userRole);
   const isSuperAdmin = role === "SUPER_ADMIN";
   const toasts = useToasts();
@@ -323,9 +324,7 @@ export default function UsersPage() {
 
       <div className="mt-6">
         {loading ? (
-          <div className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-            Loading users...
-          </div>
+          <Spinner size={32} />
         ) : (
           <UserTable
             users={users}

@@ -1,10 +1,9 @@
-// frontend/app/loading.tsx
 import { Spinner } from "@/components/ui/spinner";
 
-export default function Loading() {
+export default function AuthLoading() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
-      <Spinner size={40} />
+      <Spinner size={32} />
     </div>
   );
 }

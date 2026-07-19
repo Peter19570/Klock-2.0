@@ -12,6 +12,7 @@ import {
 } from "@/features/organization/api";
 import { useAuthStore } from "@/store/auth-store";
 import { useRouter } from "next/navigation";
+import { Spinner } from "@/components/ui/spinner";
 
 function formatDate(dateStr?: string) {
   if (!dateStr) return "—";
@@ -85,9 +86,7 @@ export function AdminOrgView() {
       </div>
 
       {loading || !organization ? (
-        <div className="mt-6 rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-          Loading organization...
-        </div>
+        <Spinner size={32} />
       ) : (
         <>
           <div className="mt-6 space-y-4 rounded-2xl border border-border bg-card p-4 text-sm shadow-sm sm:p-5">

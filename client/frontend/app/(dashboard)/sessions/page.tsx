@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { SlidersHorizontal, ArrowLeft, Download } from "lucide-react";
 import { Pagination } from "@/components/common/pagination";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { Spinner } from "@/components/ui/spinner";
 
 type PageResponseSessionResponse =
   components["schemas"]["PageResponseSessionResponse"];
@@ -308,9 +309,7 @@ export default function SessionsPage() {
 
       <div className="mt-6">
         {loading ? (
-          <div className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-            Loading sessions...
-          </div>
+          <Spinner size={32} />
         ) : (
           <SessionTable
             sessions={sessions}

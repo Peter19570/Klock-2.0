@@ -16,7 +16,8 @@ frontend/
 │   │   │   └── page.tsx
 │   │   ├── verify-email
 │   │   │   └── page.tsx
-│   │   └── layout.tsx
+│   │   ├── layout.tsx
+│   │   └── loading.tsx
 │   ├── (dashboard)
 │   │   ├── attendance
 │   │   │   └── page.tsx
@@ -35,7 +36,8 @@ frontend/
 │   │   ├── users
 │   │   │   └── page.tsx
 │   │   ├── error.tsx
-│   │   └── layout.tsx
+│   │   ├── layout.tsx
+│   │   └── loading.tsx
 │   ├── api
 │   │   └── auth
 │   │       ├── login
@@ -50,6 +52,7 @@ frontend/
 │   ├── global-error.tsx
 │   ├── globals.css
 │   ├── layout.tsx
+│   ├── loading.tsx
 │   ├── not-found.tsx
 │   └── page.tsx
 ├── components
@@ -85,6 +88,7 @@ frontend/
 │       ├── popover.tsx
 │       ├── scroll-area.tsx
 │       ├── select.tsx
+│       ├── spinner.tsx
 │       └── textarea.tsx
 ├── config
 │   └── nav.ts
