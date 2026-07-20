@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { REFRESH_COOKIE_NAME } from "@/lib/api/config";
 
+const REFRESH_COOKIE_NAME = "klock_rt"; // inline it, zero imports
 const PROTECTED_PREFIXES = ["/dashboard", "/attendance", "/sessions", "/branches", "/users", "/organization", "/audits", "/settings"];
 
 export function middleware(request: NextRequest) {
