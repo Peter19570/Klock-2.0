@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { API_BASE_URL } from "@/lib/api/config";
+import { API_BASE_URL } from "@/lib/api/api-config";
 
 type Status = "verifying" | "success" | "error";
 
@@ -17,20 +17,28 @@ export function VerifyEmailStatus() {
       setStatus("error");
       return;
     }
-    fetch(`${API_BASE_URL}/api/v1/auth/verify-email?token=${encodeURIComponent(token)}`)
+    fetch(
+      `${API_BASE_URL}/api/v1/auth/verify-email?token=${encodeURIComponent(token)}`,
+    )
       .then((res) => setStatus(res.ok ? "success" : "error"))
       .catch(() => setStatus("error"));
   }, [token]);
 
   if (status === "verifying") {
-    return <p className="text-sm text-muted-foreground">Verifying your email...</p>;
+    return (
+      <p className="text-sm text-muted-foreground">Verifying your email...</p>
+    );
   }
 
   if (status === "error") {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-destructive">This verification link is invalid or has expired.</p>
-        <Link href="/login" className="text-sm text-primary hover:underline">Back to sign in</Link>
+        <p className="text-sm text-destructive">
+          This verification link is invalid or has expired.
+        </p>
+        <Link href="/login" className="text-sm text-primary hover:underline">
+          Back to sign in
+        </Link>
       </div>
     );
   }
@@ -38,7 +46,9 @@ export function VerifyEmailStatus() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-foreground">Your email is verified.</p>
-      <Link href="/login" className="text-sm text-primary hover:underline">Continue to sign in</Link>
+      <Link href="/login" className="text-sm text-primary hover:underline">
+        Continue to sign in
+      </Link>
     </div>
   );
 }

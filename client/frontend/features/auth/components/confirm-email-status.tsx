@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { API_BASE_URL } from "@/lib/api/config";
+import { API_BASE_URL } from "@/lib/api/api-config";
 
 type Status = "confirming" | "success" | "error";
 

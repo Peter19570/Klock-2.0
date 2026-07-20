@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { API_BASE_URL } from "@/lib/api/config";
+import { API_BASE_URL } from "@/lib/api/api-config";
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");

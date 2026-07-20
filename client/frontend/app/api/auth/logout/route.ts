@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { SERVER_API_BASE_URL, REFRESH_COOKIE_NAME } from "@/lib/api/config";
+import { SERVER_API_BASE_URL, REFRESH_COOKIE_NAME } from "@/lib/api/api-config";
 
 export async function POST() {
   const cookieStore = await cookies();

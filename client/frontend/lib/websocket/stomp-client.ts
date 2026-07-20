@@ -2,7 +2,7 @@
 
 import { Client, type IMessage, type StompSubscription } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import { API_BASE_URL } from "@/lib/api/config";
+import { API_BASE_URL } from "@/lib/api/api-config";
 import { useAuthStore } from "@/store/auth-store";
 
 type ConnectCallback = () => void;

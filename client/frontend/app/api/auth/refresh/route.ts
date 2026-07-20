@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { SERVER_API_BASE_URL, REFRESH_COOKIE_NAME } from "@/lib/api/config";
+import { SERVER_API_BASE_URL, REFRESH_COOKIE_NAME } from "@/lib/api/api-config";
 import type { components } from "@/lib/api/generated/schema";
 
 type ApiResponseTokenResponse = components["schemas"]["ApiResponseTokenResponse"];

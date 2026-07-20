@@ -1,6 +1,6 @@
 "use client";
 
-import { API_BASE_URL } from "@/lib/api/config";
+import { API_BASE_URL } from "@/lib/api/api-config";
 import { useAuthStore } from "@/store/auth-store";
 
 let refreshPromise: Promise<string | null> | null = null;
