@@ -28,6 +28,7 @@ export async function backendFetch(path: string, init: RequestInit = {}, isRetry
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
