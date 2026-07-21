@@ -4,8 +4,9 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  output: 'standalone',
-  distDir: '.next',
+  // REMOVE these:
+  // output: 'standalone',
+  // distDir: '.next',
 };
 
 export default nextConfig;
