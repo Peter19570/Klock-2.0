@@ -1,6 +1,7 @@
 package com.peter.klockapp.features.auth.config.cors;
 
 import com.peter.klockapp.features.auth.constants.CorsConstants;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,11 @@ public class CorsConfig {
 
     @Value("${app.cors.allowed-origins}")
     private static List<String> allowedOrigins;
+
+    @PostConstruct
+    public void logOrigins() {
+        System.out.println(">>> CORS allowed origins resolved as: " + allowedOrigins);
+    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

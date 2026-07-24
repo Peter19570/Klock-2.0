@@ -1,6 +1,7 @@
 package com.peter.klockapp.features.auth.config.security;
 
 import com.peter.klockapp.features.auth.config.jwt.JwtFilter;
+import com.peter.klockapp.features.auth.constants.CorsConstants;
 import com.peter.klockapp.features.auth.constants.SecurityConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -38,7 +39,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, CorsConstants.PATTERN).permitAll()
                         .requestMatchers(SecurityConstants.PUBLIC_URLS).permitAll()
                         .requestMatchers(SecurityConstants.SWAGGER_URLS).permitAll()
                         .requestMatchers(SecurityConstants.WEBHOOK_URLS).permitAll()
