@@ -1,7 +1,5 @@
 package com.peter.klockapp.features.auth.constants;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import java.util.List;
 
 public final class CorsConstants {
