@@ -15,12 +15,7 @@ import java.util.List;
 public class CorsConfig {
 
     @Value("${app.cors.allowed-origins}")
-    private static List<String> allowedOrigins;
-
-    @PostConstruct
-    public void logOrigins() {
-        System.out.println(">>> CORS allowed origins resolved as: " + allowedOrigins);
-    }
+    private List<String> allowedOrigins;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
