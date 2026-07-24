@@ -45,6 +45,11 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
+        if (request.getMethod().equals("OPTIONS")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
             UUID userId = UUID.fromString(jwtService.extractUserId(jwt));
             UUID orgId = UUID.fromString(jwtService.extractUserOrgId(jwt));
